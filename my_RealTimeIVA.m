@@ -7,13 +7,13 @@ close all;
 fft_length          = 256;                      %unit is sample
 window_length       = fft_length;               %unit is sample
 shift_size          = 64;                       %unit is sample
-beta                = 0.5;                     %smoothing factor
+beta                = 0.5;                      %smoothing factor
 reverbration_time   = 250;                      %unit is ms
 windows             = hanning(fft_length);      %hanning window
 expect_sample_rate  = 8000;                     %8kHz sample rate
 yita                = 1.4;                      %gridant desent coeff
 start_simulate_point= 120000;                   %point start used to simulate
-simulation_length   = 60000;                    %length used to simulate, unit is ms
+simulation_length   = 140000;                   %length used to simulate, unit is ms
 c                   = 344;                      % Sound velocity(m/s)
 reciver_position1   = [ 2.0 2.0 2.4 ];          % Receiver position[ x y z ](m)
 source_position1    = [ 2.0 2.4 2.0 ];          % Source position[ x y z ](m)
@@ -45,9 +45,8 @@ impulse22 = rir_generator(c,expect_sample_rate,reciver_position2,source_position
 
 observation1=conv(source1,impulse11)+conv(source2,impulse21);
 observation2=conv(source1,impulse12)+conv(source2,impulse22);
-
 contrast_plot(source1,source2,expect_sample_rate,'source');
-contrast_plot(observation1,observation2,expect_sample_rate,'obeservation');
+contrast_plot(observation1,observation2,expect_sample_rate,'observation');
 
 
 %//5 initialize demixing matrix
@@ -94,7 +93,10 @@ for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nt
 end
 
 toc
-contrast_plot(estimate_out1,estimate_out2,expect_sample_rate,'sperated');
+estimate_out1 = estimate_out1/max(abs(estimate_out1));
+estimate_out2 = estimate_out2/max(abs(estimate_out2));
+
+contrast_plot(estimate_out1,estimate_out2,expect_sample_rate,'separated');
 function contrast_plot(x,y,fs,title_str)
     figure;
     subplot(2,1,1);
@@ -109,9 +111,6 @@ function contrast_plot(x,y,fs,title_str)
     ylabel('relative sound intensity');
     pause(0);
 end
-
-
-
 
 
                              
