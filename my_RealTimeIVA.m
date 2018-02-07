@@ -99,14 +99,14 @@ function contrast_plot(x,y,fs,title_str)
     figure;
     subplot(2,1,1);
     plot((1:length(x))/fs,x,'b');
-    xlable('time(s)');
-    ylable('relative sound intensity');
+    xlabel('time(s)');
+    ylabel('relative sound intensity');
     title([title_str,'1']);
     subplot(2,1,2);
     plot((1:length(y))/fs,y,'b');
     title([title_str,'2']);
-    xlable('time(s)');
-    ylable('relative sound intensity');
+    xlabel('time(s)');
+    ylabel('relative sound intensity');
     pause(0);
 end
 
