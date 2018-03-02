@@ -63,7 +63,7 @@ estimate_out1       = zeros(length(observation1),1);
 estimate_out2       = zeros(length(observation2),1);
 norm_coeff          = zeros(2,2,fft_length);
 tic;
-%//6 iterator
+%//6 iteration
 for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nth times
     audio_cut1 = observation1((n-1)*shift_size+1:(n-1)*shift_size+window_length).*windows;
     audio_cut2 = observation2((n-1)*shift_size+1:(n-1)*shift_size+window_length).*windows;
@@ -71,18 +71,23 @@ for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nt
     audio_cut1_fft = fft(audio_cut1);
     audio_cut2_fft = fft(audio_cut2);
     audio_cut_fft  = [audio_cut1_fft, audio_cut2_fft];
-    for k = 1:fft_length
+    for k = 1:floor(fft_length/2+1)
         audio_estimate(k,:) = (G(:,:,k)* (audio_cut_fft(k,:)).').';
         norm_coeff(:,:,k)   = diag(diag(inv(G(:,:,k))));
     end
-    
+    for k = floor(fft_length/2+1)+1:fft_length
+        audio_estimate(k,:) = conj(audio_estimate(fft_length-k+2,:));
+    end
     phi = audio_estimate ./ (sqrt(diag((audio_estimate)'*(audio_estimate)))');
-    for k = 1:fft_length
+    for k = 1:floor(fft_length/2+1)
        R(:,:,k)   = (audio_estimate(k,:)'*phi(k,:)).';
        gradient_k = (diag(diag(R(:,:,k)))-R(:,:,k))*G(:,:,k);
        G(:,:,k)   = G(:,:,k) + yita/sqrt(ksi(k))*gradient_k;
        ksi(k)     = beta * ksi(k) + (1-beta)  * (audio_cut_fft(k,:)*audio_cut_fft(k,:)')/2;
        audio_estimate(k,:) = audio_estimate(k,:) * norm_coeff(:,:,k);
+    end
+    for k = floor(fft_length/2+1)+1:fft_length
+       audio_estimate(k,:) = conj(audio_estimate(fft_length-k+2,:));
     end
     estimate_out1((n-1)*shift_size+1:(n-1)*shift_size+window_length)=...
                   ifft(audio_estimate(:,1))+estimate_out1((n-1)*shift_size...
