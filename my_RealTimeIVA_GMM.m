@@ -5,16 +5,16 @@ clear;
 close all;
 %//2 initialize some coeffs according to the paper 
 gamma_whiten        = 0.001;
-lambda              = 1;
-Ns                  = 5;
+lambda              = 0.99;
+Ns                  = 4;
 fft_length          = 256;                      %unit is sample
 window_length       = fft_length;               %unit is sample
-shift_size          = 128;                      %unit is sample
+shift_size          = 64;                      %unit is sample
 reverbration_time   = 250;                      %unit is ms
 windows             = hanning(fft_length);      %hanning window
 expect_sample_rate  = 8000;                     %8kHz sample rate
 start_simulate_point= 200000;                   %point start used to simulate
-simulation_length   = 5000;                    %length used to simulate, unit is ms
+simulation_length   = 2000;                    %length used to simulate, unit is ms
 c                   = 344;                      % Sound velocity(m/s)
 reciver_position1   = [ 2.0 2.0 2.4 ];          % Receiver position[ x y z ](m)
 source_position1    = [ 2.0 2.4 2.0 ];          % Source position[ x y z ](m)
@@ -58,8 +58,8 @@ end
 gaussian_s1         = 1:Ns;
 gaussian_s2         = 1:Ns;
 gaussian_st         = meshgrid(gaussian_s1,gaussian_s2);
-gassian_v1          = ones(fft_length,Ns);
-gassian_v2          = ones(fft_length,Ns)/2;
+gassian_v1          = randn(fft_length,Ns);
+gassian_v2          = randn(fft_length,Ns);
 p_s1                = ones(1,Ns)/Ns;
 p_s2                = ones(1,Ns)/Ns;
 p_st                = ones(size(gaussian_st))/Ns/Ns;
@@ -69,7 +69,7 @@ q_st                = meshgrid(q_s1,q_s2);
 step1_tmp           = zeros(size(q_st));
 V                   = W;                                %whitening matrix
 I                   = [1,0;0,1];                        %unit matrix 
-M                   = W;
+M                   = zeros(size(W));
 beta                = zeros(1,fft_length);
 audio_estimate      = zeros(fft_length,2);
 audio_estimate_trans= audio_estimate.';
@@ -81,6 +81,7 @@ m_2r                = q_s2;
 m_2r_old            = zeros(1,Ns);
 signal_whitened     = zeros(2,fft_length);
 akbk_star           = zeros(2,1,fft_length);
+test_whitening      = zeros(2,floor(length(observation1)/window_length)+10);
 tic;
 %//6 iterator
 for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nth times
@@ -89,28 +90,50 @@ for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nt
     audio_cut1_fft = fft(audio_cut1);
     audio_cut2_fft = fft(audio_cut2);
     audio_cut_fft  = [audio_cut1_fft, audio_cut2_fft].';
+    %online whitening
     for k = 1:floor(fft_length/2+1)
         signal_whitened(:,k) = V(:,:,k)*audio_cut_fft(:,k);
         V(:,:,k) = V(:,:,k)+gamma_whiten*(I-signal_whitened(:,k)*signal_whitened(:,k)')*V(:,:,k);
     end
-%     for k = floor(fft_length/2+1)+1:fft_length
-%         signal_whitened(:,k) = conj(signal_whitened(:,fft_length-k+2));
-%     end
+    %record some samples to test whitening efficiency
+    test_whitening(:,n) = signal_whitened(:,4);
     %E-Step
     for index_s1=1:Ns
         for index_s2=1:Ns
             product_frequency = 0;
             for k=1:floor(fft_length/2+1)
-                product_frequency = product_frequency+log(multi_guassian_calculate...
-                                            (signal_whitened(:,k),W(:,:,k)'...
-                                            *diag([gassian_v1(k,index_s1),gassian_v2(k,index_s2)])*W(:,:,k)));
+                product_frequency = product_frequency+(multi_guassian_calculate(signal_whitened(:,k),W(:,:,k)'...
+                  *diag([gassian_v1(k,index_s1),gassian_v2(k,index_s2)])*W(:,:,k)));
+                if (isnan(product_frequency)||isinf(product_frequency))
+                    fprintf('1')
+                    return;
+                end
             end
-            q_st(index_s1,index_s2)=log(p_s1(index_s1))+log(p_s2(index_s2))+product_frequency;
+            q_st(index_s1,index_s2)=log(p_s1(index_s1)*p_s2(index_s2))+product_frequency;
+            if (find(isnan(q_st)))
+                fprintf('2');
+                return;
+            end
         end
     end
-    
+    q_st = q_st-max(max(q_st));
     q_st = exp(q_st)/sum(sum(exp(q_st))); 
+    if (find(isnan(q_st)))
+        fprintf('5');
+        return;
+    end
     %M-Step
+    q_s1 = sum(q_st,2).';
+    q_s2 = sum(q_st,1);
+    m_1r_old = m_1r;
+    m_2r_old = m_2r;
+    m_1r = lambda * m_1r + q_s1;
+    m_2r = lambda * m_2r + q_s2;
+    p_s1 = m_1r;
+    p_s2 = m_2r;
+
+    p_s1=p_s1/sum(p_s1);
+    p_s2=p_s2/sum(p_s2);
     for k = 1:floor(fft_length/2+1)
         
         for index_s1=1:Ns
@@ -120,31 +143,32 @@ for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nt
             end
         end
         
+
         M(:,:,k) = lambda*M(:,:,k)+sum(sum(step1_tmp))*signal_whitened(:,k)*signal_whitened(:,k)';
         beta(k) = (M(1,1,k)+M(2,2,k))/2-sqrt(((M(1,1,k)-M(2,2,k))^2)/4+abs(M(1,2,k))^2);
+        if (find(isnan(beta)))
+            fprintf('4');
+            return;
+        end
         akbk_star(:,:,k) = 1/sqrt(1+((beta(k)-M(1,1,k))/M(1,2,k))^2)*[1;(beta(k)-M(1,1,k))/M(1,2,k)];
         tmp_a=akbk_star(1,1,k)';
         tmp_b=akbk_star(2,1,k)';
         W(:,:,k) = [tmp_a,tmp_b;-tmp_b',tmp_a'];
-        q_s1 = sum(q_st,2).';
-        q_s2 = sum(q_st,1);
+
         
         audio_estimate(k,:) = (W(:,:,k)*signal_whitened(:,k)).';
-        m_1r_old = m_1r;
-        m_2r_old = m_2r;
+
         for index=1:Ns
-            m_1r = lambda * m_1r + q_s1(index);
-            m_2r = lambda * m_2r + q_s2(index);
-            gassian_v1(k,index) = 1/(1/gassian_v1(k,index)*m_1r_old(index)/m_1r(index)+...
-                                q_s1(index)/m_1r(index)*audio_estimate(k,1)*audio_estimate(k,1)');
-            gassian_v2(k,index) = 1/(1/gassian_v2(k,index)*m_2r_old(index)/m_2r(index)+...
-                                q_s2(index)/m_2r(index)*audio_estimate(k,2)*audio_estimate(k,2)');
-            p_s1(index) = m_1r(index);
-            p_s2(index) = m_2r(index);
-            
+            gassian_v1(k,index) = real(1/(1/gassian_v1(k,index)*m_1r_old(index)/m_1r(index)+...
+                                q_s1(index)/m_1r(index)*audio_estimate(k,1)*audio_estimate(k,1)'));
+            gassian_v2(k,index) = real(1/(1/gassian_v2(k,index)*m_2r_old(index)/m_2r(index)+...
+                                q_s2(index)/m_2r(index)*audio_estimate(k,2)*audio_estimate(k,2)'));
+                            
+            if(isnan(gassian_v1(k,index))||isnan(gassian_v2(k,index)))
+                fprintf('7');
+                return;
+            end
         end
-        p_s1=p_s1/sum(p_s1);
-        p_s2=p_s2/sum(p_s2);
         audio_estimate(k,:) = (diag(diag(inv(W(:,:,k)*V(:,:,k))))*audio_estimate(k,:).').';
     end
     for k = floor(fft_length/2+1)+1:fft_length
@@ -156,7 +180,7 @@ for n = 1:(floor((length(observation1)-window_length)/shift_size))       % at Nt
                     +1:(n-1)*shift_size+window_length);
     estimate_out2((n-1)*shift_size+1:(n-1)*shift_size+window_length)=...
                   ifft(audio_estimate(:,2))+estimate_out2((n-1)*shift_size...
-                    +1:(n-1)*shift_size+window_length);
+                    +1:(n-1)*shift_size+window_length);        
 end
 
 toc
@@ -180,6 +204,6 @@ function contrast_plot(x,y,fs,title_str)
 end
 
 function p = multi_guassian_calculate(Y,Phi)
-p = abs(sqrt(abs(det(Phi)))/2/pi*exp(-1/2*Y'*Phi*Y));
+p = real(log(abs(sqrt(abs(det(Phi)))/2/pi))+((-1/2*Y'*Phi*Y)));
 end
                              
