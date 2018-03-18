@@ -1,0 +1,13 @@
+
+syntax="proto2";
+package iva;
+
+
+message config {
+    required float beta = 1;
+    required float eta = 2;
+    required float fft_length = 3;
+    required float window_type = 4;
+    required float shift_size = 5;
+}
+
