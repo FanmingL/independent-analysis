@@ -8,7 +8,9 @@
 
 int main(int argc, char** argv)
 {
-	std::cout<<"Hello World\n";
+	iva::iva iva_algorithm;
+	iva_algorithm.print_parameter();	
+	
 	return 0;
 }
 

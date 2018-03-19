@@ -7,6 +7,7 @@
 #include "iva.h"
 iva::iva::iva()
 {
+	proto_path = PROTO_CONFIG_PATH;
 	parameter_read();
 }
 
@@ -30,11 +31,27 @@ bool iva::iva::is_complete(void)
 
 void iva::iva::parameter_read(void)
 {
-	std::string proto_path = "../../config/iva.prototxt";
-//	ReadProtoFromTextFile(proto_path.c_str(), &config);
-
+	ReadProtoFromTextFile(proto_path.c_str(), &config);
+	beta 		= config.beta();
+	eta  		= config.eta();
+	fft_length	= config.fft_length();
+	shift_size 	= config.shift_size();
+	window_type = config.window_type();
+	is_debug 	= config.is_debug();
 }
 			
+void iva::iva::print_parameter(void)
+{
+	std::cout 	<< " \tbeta:\t\t "<<beta
+				<< " \n\teta:\t\t "<<eta
+				<< " \n\tfft_length:\t "<<fft_length
+				<< " \n\tshift_size:\t "<<shift_size
+				<< " \n\twindow_type:\t "<<window_type
+				<< " \n\tis_debug:\t "<<is_debug
+				<<std::endl;
+}
+
+
 template<class T>
 bool iva::iva::ReadProtoFromTextFile(const std::string &file_name, T *proto) {
 	using google::protobuf::io::FileInputStream;

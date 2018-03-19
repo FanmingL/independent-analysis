@@ -25,26 +25,6 @@
 #include "proto/iva.pb.h"
 namespace iva
 {
-	typedef	struct 
-	{
-		//smoothing factor
-		float beta;		
-		//gradient desent coefficient
-		float eta;					
-		//FFT length
-		int fft_length;
-		//window shift size
-		int shift_size;
-		//window type
-		//1(default) Hanning Window
-		//2 		 Hamming Window
-		//3 		 Bartlett Window
-		//4 		 Rectangle Window
-		int window_type;
-		//is debug mode
-		bool is_debug;
-	}config_info_t; 
-
 	class iva
 	{
 		public:
@@ -55,8 +35,9 @@ namespace iva
 			std::vector<int> get_current_batch(int source_index);
 			//get the flag
 			bool is_complete(void);
+			void print_parameter(void);
 		private:
-			config_info_t config;
+			config_t config;
 			float beta;
 			float eta;
 			int fft_length;
@@ -64,6 +45,7 @@ namespace iva
 			int window_type;
 			bool is_debug;
 					
+			std::string proto_path;
 			bool current_batch_finish_flag;
 			std::vector<Eigen::VectorXf> signal_buf;
 			std::vector<std::vector<int> > estimate_signal_buf;

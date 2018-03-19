@@ -1,5 +1,8 @@
 beta: 			0.5
 eta: 			1.0
-fftlength: 		512
-window_type     1
-is_debug 		false
+fft_length: 		512
+shift_size:     	64
+window_type:     	1
+
+is_debug: 		true
+
