@@ -2,7 +2,7 @@ Real-Time Independent Vector Analysis C++ library
 ===
 IVA library is based on Eigen3 and Google ProtoBuf, and compiled in cmake, so install Eigen3, ProtoBuf, CMake, before using it.<br>
 
-Install the dependencies on Unbuntu
+Install the dependencies on Ubuntu
 ----
 ```shell
 sudo apt-get install protobuf-compiler libprotobuf-dev libeigen3-dev
