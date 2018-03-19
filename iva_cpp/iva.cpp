@@ -30,7 +30,31 @@ bool iva::iva::is_complete(void)
 
 void iva::iva::parameter_read(void)
 {
-
+	std::string proto_path = "../../config/iva.prototxt";
+//	ReadProtoFromTextFile(proto_path.c_str(), &config);
 
 }
-
+			
+template<class T>
+bool iva::iva::ReadProtoFromTextFile(const std::string &file_name, T *proto) {
+	using google::protobuf::io::FileInputStream;
+	using google::protobuf::io::FileOutputStream;
+	using google::protobuf::io::ZeroCopyInputStream;
+	using google::protobuf::io::CodedInputStream;
+	using google::protobuf::io::ZeroCopyOutputStream;
+	using google::protobuf::io::CodedOutputStream;
+	using google::protobuf::Message;
+		    
+	int fd = open(file_name.c_str(), O_RDONLY);
+	if (fd == -1) {
+		std::cout<<"Can't Open the file\n";
+		return false;
+	}
+	FileInputStream *input = new FileInputStream(fd);
+	bool success = google::protobuf::TextFormat::Parse(input, proto);
+	delete input;
+	close(fd);
+	return success;
+}
+	
+	

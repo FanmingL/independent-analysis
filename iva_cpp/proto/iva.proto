@@ -6,8 +6,9 @@ package iva;
 message config {
     required float beta = 1;
     required float eta = 2;
-    required float fft_length = 3;
-    required float window_type = 4;
-    required float shift_size = 5;
+    required int32 fft_length = 3;
+    required int32 shift_size = 4;
+    optional int32 window_type = 5 [default = 1];
+	optional bool is_debug = 6 [default = true];
 }
 
