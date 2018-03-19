@@ -17,44 +17,65 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/text_format.h>
-
-#include "proto/iva.pb.h"
+#include <cmath>
 namespace iva
 {
 	class iva
 	{
-		public:
-			iva();
-			//for every single signal, call this approach
-			void process(std::vector<int> signal_mixed);
-			//get the batch which has been prepared
-			std::vector<int> get_current_batch(int source_index);
-			//get the flag
-			bool is_complete(void);
-			void print_parameter(void);
-		private:
-			config_t config;
-			float beta;
-			float eta;
-			int fft_length;
-			int shift_size;
-			int window_type;
-			bool is_debug;
-					
-			std::string proto_path;
-			bool current_batch_finish_flag;
-			std::vector<Eigen::VectorXf> signal_buf;
-			std::vector<std::vector<int> > estimate_signal_buf;
-			void parameter_read(void);
-			template<class T>
-			bool ReadProtoFromTextFile(const std::string &file_name, T *proto);
-	
+    public:
+        iva();
+        ~iva();
+        //for every single signal, call this approach
+        void process(void);
+        //get the batch which has been prepared
+        float** get_current_batch(int source_index);
+        //get the flag
+        bool is_processed(void);
+        bool is_debug_mode(void);
+        void print_parameter(void);
+        void data_prepare(std::vector<float> signal_mixed);
+        std::string get_data_path(void);
+        std::string get_config_path(void);
+        float** get_raw_data(void);
+        int get_source_num(void);
+        int get_time_points(void);
+    private:
+        
+        float beta;
+        float eta;
+        int fft_length;
+        int shift_size;
+        int window_type;
+        int time_points;
+        bool is_debug;
+        int source_num;
+        int buffer_size_now;
+        bool if_read_data;
+        float sample_rate;
+        Eigen::VectorXf window;
+        float **raw_data;
+        
+        std::string proto_path;
+        std::string data_path;
+        std::vector<Eigen::MatrixXcf> unmix_matrix;
+        std::vector<Eigen::MatrixXcf> r_matrix;
+        std::vector<Eigen::MatrixXcf> norm_matrix;
+        
+        bool current_batch_finish_process_flag;
+        bool current_batch_finish_prepare_flag;
+        Eigen::MatrixXf signal_buf_prepare,signal_buf_process;
+        Eigen::MatrixXf I_matrix;
+        void data_load(void);
+        float** estimate_signal_buf;
+        void parameter_read(void);
+        //template<class T>
+        //friend bool read_proto_from_text_file<T>(const std::string &file_name, T *proto);
+        void window_generate(void);
+        Eigen::FFT<float> fft;
 	};
-
+    template<class T>
+    bool read_proto_from_text_file(const std::string &file_name, T *proto);
+    
 }
 
 

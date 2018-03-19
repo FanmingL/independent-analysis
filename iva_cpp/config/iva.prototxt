@@ -1,8 +1,11 @@
-beta: 			0.5
-eta: 			1.0
-fft_length: 		512
-shift_size:     	64
-window_type:     	1
 
-is_debug: 		true
+	beta: 			0.5	
+	eta: 			1.0
+	fft_length: 		512
+	shift_size:     	64
+	window_type:     	1
+	source_num:			2
+	sample_rate: 		8000
+	is_debug: 		true
+	if_read_data:		true
 
