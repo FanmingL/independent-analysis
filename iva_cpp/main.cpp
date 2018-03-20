@@ -7,9 +7,10 @@
 #include "iva.h"
 #include <iostream>
 #include <fstream>
+#include <ctime>
 int main(int argc, char** argv)
 {
-	iva::iva iva_algorithm;
+	iva::iva_double_channel iva_algorithm;
     float **raw_data = iva_algorithm.get_raw_data();
     float **estimate_data ;
     int source_num = iva_algorithm.get_source_num();
@@ -20,8 +21,9 @@ int main(int argc, char** argv)
     data_path_out  += ".csv";
     outfile.open(data_path_out);
     if(!outfile) std::cout<<"error"<<std::endl;
-    
-    
+    std::cout<<"audio last about "<<time_points/iva_algorithm.get_sample_rate()<<" seconds"<<std::endl;
+   	time_t now,end;
+	now = time(NULL);
     for (int i = 0;i<time_points;i++)
     {
         std::vector<float> current_observed(source_num,0);
@@ -48,9 +50,13 @@ int main(int argc, char** argv)
             }
         }
     }
+    end = time(NULL);
 
     
     outfile.close();
+    iva_algorithm.print_parameter();
+    std::cout<<"program finished running \n unmixed signal is stored in "<<data_path_out<<std::endl;
+	std::cout<<"program spent about " << end-now <<" seconds \n";
     return 0;
     
     
