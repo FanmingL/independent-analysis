@@ -24,7 +24,6 @@ mkdir build
 cd build
 cmake ..
 make
-./bin/iva
 ```
 About the config folder
 ------
@@ -41,4 +40,13 @@ then sound them as follow
 
 ```matlab
 sound(source_estimate1/max(abs(source_estimate1)),sample_rate) %where sample_rate is the sample rate of the source signal.
+```
+
+Config the number of audio sources 
+------
+To compile right number of sources library, SOURCE_NUM definition should be right configured.<br>
+SOURCE_NUM is configured in `CMakeLists.txt`.
+For example, if number of sources the **first line** of `CMakeLists.txt` should be.
+```bash
+ADD_DEFINITIONS(-DSOURCE_NUM=2)
 ```
