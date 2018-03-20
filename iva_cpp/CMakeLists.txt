@@ -1,3 +1,4 @@
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DSOURCE_NUM=2)
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 11)
@@ -20,7 +21,7 @@ function(modified_protobuf_generate_cpp output_dir proto_srcs proto_hdrs)
   else()
     set(_protoc_include -I ${CMAKE_CURRENT_SOURCE_DIR})
   endif()
- 
+
   if(DEFINED PROTOBUF_IMPORT_DIRS)
     foreach(dir ${PROTOBUF_IMPORT_DIRS})
       get_filename_component(abs_path ${dir} ABSOLUTE)

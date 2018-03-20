@@ -630,7 +630,7 @@ void iva::iva_optimized::algorithm_init(void)
     if (if_read_data)data_load();
     estimate_signal_buf = (float **) malloc(shift_size * sizeof(float * ));
     for (int i=0;i<shift_size;i++)estimate_signal_buf[i] = (float *)malloc(source_num * sizeof(float));
-    for (int i=0;i<fft_length;i++)unmix_matrix.push_back(Eigen::Matrix<float, SOURCE_NUM, SOURCE_NUM>::Identity());
+    for (int i=0;i<fft_length;i++)unmix_matrix.push_back(Eigen::Matrix<std::complex<float>, SOURCE_NUM, SOURCE_NUM>::Identity());
     r_matrix = unmix_matrix;
     r_matrix_diag = unmix_matrix;
     norm_matrix = unmix_matrix;

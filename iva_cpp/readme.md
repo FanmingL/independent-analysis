@@ -24,6 +24,7 @@ mkdir build
 cd build
 cmake ..
 make
+sudo make install
 ./bin/iva #to run the program
 ```
 About the config folder
