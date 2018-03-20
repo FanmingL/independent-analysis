@@ -320,14 +320,14 @@ int iva::iva::get_shift_size(void)
 ////////////////////////////////////
 
 
-iva::iva_double_channel::iva_double_channel()
+iva::iva_optimized::iva_optimized()
 {
     proto_path = PROTO_CONFIG_PATH;
     data_path  = PROTO_DATA_PATH;
     algorithm_init();
 }
 
-iva::iva_double_channel::iva_double_channel(std::string config_path_, std::string data_path_)
+iva::iva_optimized::iva_optimized(std::string config_path_, std::string data_path_)
 {
     proto_path = config_path_;
     data_path  = data_path_;
@@ -335,7 +335,7 @@ iva::iva_double_channel::iva_double_channel(std::string config_path_, std::strin
 }
 
 
-iva::iva_double_channel::~iva_double_channel()
+iva::iva_optimized::~iva_optimized()
 {
     if (if_read_data)
     {
@@ -346,15 +346,15 @@ iva::iva_double_channel::~iva_double_channel()
     free((void *)estimate_signal_buf);
 }
 
-void iva::iva_double_channel::process(void)
+void iva::iva_optimized::process(void)
 {
     
     if (current_batch_finish_prepare_flag)
     {
-         Eigen::Matrix<float, Eigen::Dynamic, 2>
+         Eigen::Matrix<float, Eigen::Dynamic, SOURCE_NUM>
         signal_observed = signal_buf_process;
-        Eigen::Matrix<std::complex<float>, Eigen::Dynamic, 2> signal_fft(fft_length,source_num),signal_esitimate_fft(fft_length,source_num);
-        Eigen::Vector2f phi_tmp;
+        Eigen::Matrix<std::complex<float>, Eigen::Dynamic, SOURCE_NUM> signal_fft(fft_length,source_num),signal_esitimate_fft(fft_length,source_num);
+         Eigen::Matrix<float, SOURCE_NUM, 1> phi_tmp;
         //step 1 window the signal and FFT
         for (int i=0;i<source_num;i++)
         {
@@ -408,7 +408,7 @@ void iva::iva_double_channel::process(void)
 
 
 
-void iva::iva_double_channel::data_prepare(std::vector<float> signal_mixed)
+void iva::iva_optimized::data_prepare(std::vector<float> signal_mixed)
 {
     for (int i=0;i<source_num;i++)
     {
@@ -435,7 +435,7 @@ void iva::iva_double_channel::data_prepare(std::vector<float> signal_mixed)
 }
 
 
-void iva::iva_double_channel::window_generate(void)
+void iva::iva_optimized::window_generate(void)
 {
     window.setOnes(fft_length,1);
     if (window_type==1) //Hanning window
@@ -461,24 +461,24 @@ void iva::iva_double_channel::window_generate(void)
     }
 }
 
-float** iva::iva_double_channel::get_current_batch(void)
+float** iva::iva_optimized::get_current_batch(void)
 {
     current_batch_finish_process_flag = false;
     return estimate_signal_buf;
 }
 
-bool iva::iva_double_channel::is_processed(void)
+bool iva::iva_optimized::is_processed(void)
 {
     return current_batch_finish_process_flag;
 }
 
-float  iva::iva_double_channel::get_sample_rate(void)
+float  iva::iva_optimized::get_sample_rate(void)
 {
     
     return sample_rate;
 }
 
-void iva::iva_double_channel::parameter_read(void)
+void iva::iva_optimized::parameter_read(void)
 {
     config_t config;
     read_proto_from_text_file(proto_path.c_str(), &config);
@@ -489,12 +489,12 @@ void iva::iva_double_channel::parameter_read(void)
     window_type = config.window_type();
     is_debug     = config.is_debug();
     source_num  = config.source_num();
-    if (source_num != 2)
+    if (source_num != SOURCE_NUM)
         throw source_num;
     if_read_data= config.if_read_data();
     sample_rate = config.sample_rate();
 }
-void iva::iva_double_channel::data_load(void)
+void iva::iva_optimized::data_load(void)
 {
     acoustics_t signal_read;
     read_proto_from_text_file(data_path.c_str(), &signal_read);
@@ -518,7 +518,7 @@ void iva::iva_double_channel::data_load(void)
     }
 }
 
-void iva::iva_double_channel::print_parameter(void)
+void iva::iva_optimized::print_parameter(void)
 {
     std::cout     << " \tbeta:\t\t "<<beta
     << " \n\teta:\t\t "<<eta
@@ -534,38 +534,38 @@ void iva::iva_double_channel::print_parameter(void)
 
 
 
-bool iva::iva_double_channel::is_debug_mode()
+bool iva::iva_optimized::is_debug_mode()
 {
     return is_debug;
 }
 
-std::string iva::iva_double_channel::get_data_path(void)
+std::string iva::iva_optimized::get_data_path(void)
 {
     return data_path;
 }
 
 
-std::string iva::iva_double_channel::get_config_path(void)
+std::string iva::iva_optimized::get_config_path(void)
 {
     return proto_path;
 }
 
-float** iva::iva_double_channel::get_raw_data(void)
+float** iva::iva_optimized::get_raw_data(void)
 {
     
     return raw_data;
 }
-int iva::iva_double_channel::get_source_num(void)
+int iva::iva_optimized::get_source_num(void)
 {
     return source_num;
 }
-int iva::iva_double_channel::get_time_points(void)
+int iva::iva_optimized::get_time_points(void)
 {
     
     return time_points;
 }
 
-Eigen::Matrix<float, Eigen::Dynamic, 2> iva::iva_double_channel::frame_shift(Eigen::Matrix<float, Eigen::Dynamic, 2> mat)
+Eigen::Matrix<float, Eigen::Dynamic, SOURCE_NUM> iva::iva_optimized::frame_shift(Eigen::Matrix<float, Eigen::Dynamic, SOURCE_NUM> mat)
 {
     for (int i=0;i<fft_length-shift_size;i++)
     {
@@ -578,7 +578,7 @@ Eigen::Matrix<float, Eigen::Dynamic, 2> iva::iva_double_channel::frame_shift(Eig
     }
     return mat;
 }
-void iva::iva_double_channel::algorithm_init(void)
+void iva::iva_optimized::algorithm_init(void)
 {
     parameter_read();
     window_generate();
@@ -594,14 +594,14 @@ void iva::iva_double_channel::algorithm_init(void)
     if (if_read_data)data_load();
     estimate_signal_buf = (float **) malloc(shift_size * sizeof(float * ));
     for (int i=0;i<shift_size;i++)estimate_signal_buf[i] = (float *)malloc(source_num * sizeof(float));
-    for (int i=0;i<fft_length;i++)unmix_matrix.push_back(Eigen::Matrix2cf::Identity());
+    for (int i=0;i<fft_length;i++)unmix_matrix.push_back(Eigen::Matrix<float, SOURCE_NUM, SOURCE_NUM>::Identity());
     r_matrix = unmix_matrix;
     r_matrix_diag = unmix_matrix;
     norm_matrix = unmix_matrix;
-    I_matrix = Eigen::Matrix2f::Identity();
+    I_matrix = Eigen::Matrix<float, SOURCE_NUM, SOURCE_NUM>::Identity();
 }
 
-int iva::iva_double_channel::get_shift_size(void)
+int iva::iva_optimized::get_shift_size(void)
 {
     return shift_size;
 }

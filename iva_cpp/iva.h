@@ -83,12 +83,12 @@ namespace iva
         Eigen::FFT<float> fft;
 	};
     
-    class iva_double_channel
+    class iva_optimized
     {
     public:
-        iva_double_channel();
-        iva_double_channel(std::string config_path_, std::string data_path_);
-        ~iva_double_channel();
+        iva_optimized();
+        iva_optimized(std::string config_path_, std::string data_path_);
+        ~iva_optimized();
         //for every single signal, call this approach
         void process(void);
         //get the batch which has been prepared
@@ -122,22 +122,22 @@ namespace iva
         
         std::string proto_path;
         std::string data_path;
-        std::vector<Eigen::Matrix2cf> unmix_matrix;
-        std::vector<Eigen::Matrix2cf> r_matrix,r_matrix_diag;
-        std::vector<Eigen::Matrix2cf> norm_matrix;
+        std::vector<Eigen::Matrix<std::complex<float>, SOURCE_NUM, SOURCE_NUM> > unmix_matrix;
+        std::vector<Eigen::Matrix<std::complex<float>, SOURCE_NUM, SOURCE_NUM> > r_matrix,r_matrix_diag;
+        std::vector<Eigen::Matrix<std::complex<float>, SOURCE_NUM, SOURCE_NUM> > norm_matrix;
         
         bool current_batch_finish_process_flag;
         bool current_batch_finish_prepare_flag;
-        Eigen::Matrix<float, Eigen::Dynamic, 2> signal_buf_prepare,signal_buf_process,signal_buf_estimate,signal_buf_estimate_overlap;
-        Eigen::Matrix2f I_matrix;
-        Eigen::Vector2f zero_matrix;
+        Eigen::Matrix<float, Eigen::Dynamic, SOURCE_NUM> signal_buf_prepare,signal_buf_process,signal_buf_estimate,signal_buf_estimate_overlap;
+        Eigen::Matrix<float, SOURCE_NUM, SOURCE_NUM> I_matrix;
+        Eigen::Matrix<float, SOURCE_NUM, 1> zero_matrix;
         
-        Eigen::Matrix<std::complex<float>, Eigen::Dynamic, 2> phi_matrix;
+        Eigen::Matrix<std::complex<float>, Eigen::Dynamic, SOURCE_NUM> phi_matrix;
         Eigen::VectorXf ksi_vector;
         void data_load(void);
         float** estimate_signal_buf;
         void parameter_read(void);
-        Eigen::Matrix<float, Eigen::Dynamic, 2> frame_shift(Eigen::Matrix<float, Eigen::Dynamic, 2> mat);
+        Eigen::Matrix<float, Eigen::Dynamic, SOURCE_NUM> frame_shift(Eigen::Matrix<float, Eigen::Dynamic, SOURCE_NUM> mat);
         void algorithm_init(void);
         void window_generate(void);
         Eigen::FFT<float> fft;

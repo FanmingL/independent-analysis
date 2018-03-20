@@ -1,3 +1,4 @@
+ADD_DEFINITIONS(-DSOURCE_NUM=2)
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 11)
 function(modified_protobuf_generate_cpp output_dir proto_srcs proto_hdrs)

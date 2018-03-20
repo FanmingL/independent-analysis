@@ -10,18 +10,20 @@
 #include <ctime>
 int main(int argc, char** argv)
 {
-	iva::iva_double_channel iva_algorithm;
+	iva::iva_optimized iva_algorithm;
     float **raw_data = iva_algorithm.get_raw_data();
     float **estimate_data ;
     int source_num = iva_algorithm.get_source_num();
     int time_points =iva_algorithm.get_time_points();
     int shift_size = iva_algorithm.get_shift_size();
+	//int source_num_defined = SOURCE_NUM;
     std::ofstream outfile;
     std::string data_path_out = iva_algorithm.get_data_path();
     data_path_out  += ".csv";
     outfile.open(data_path_out);
     if(!outfile) std::cout<<"error"<<std::endl;
     std::cout<<"audio last about "<<time_points/iva_algorithm.get_sample_rate()<<" seconds"<<std::endl;
+	//std::cout<<"sources number defined is " << SOURCE_NUM <<" \n ";
    	time_t now,end;
 	now = time(NULL);
     for (int i = 0;i<time_points;i++)
