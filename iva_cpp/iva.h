@@ -24,11 +24,12 @@ namespace iva
 	{
     public:
         iva();
-        ~iva();
+        iva(std::string config_path_, std::string data_path_);
+		~iva();
         //for every single signal, call this approach
         void process(void);
         //get the batch which has been prepared
-        float** get_current_batch(int source_index);
+        float** get_current_batch();
         //get the flag
         bool is_processed(void);
         bool is_debug_mode(void);
@@ -39,6 +40,7 @@ namespace iva
         float** get_raw_data(void);
         int get_source_num(void);
         int get_time_points(void);
+        int get_shift_size(void);
     private:
         
         float beta;
@@ -58,16 +60,22 @@ namespace iva
         std::string proto_path;
         std::string data_path;
         std::vector<Eigen::MatrixXcf> unmix_matrix;
-        std::vector<Eigen::MatrixXcf> r_matrix;
+        std::vector<Eigen::MatrixXcf> r_matrix,r_matrix_diag;
         std::vector<Eigen::MatrixXcf> norm_matrix;
         
         bool current_batch_finish_process_flag;
         bool current_batch_finish_prepare_flag;
-        Eigen::MatrixXf signal_buf_prepare,signal_buf_process;
+        Eigen::MatrixXf signal_buf_prepare,signal_buf_process,signal_buf_estimate,signal_buf_estimate_overlap;
         Eigen::MatrixXf I_matrix;
-        void data_load(void);
+        Eigen::MatrixXf zero_matrix;
+        
+       	Eigen::MatrixXcf phi_matrix;
+        Eigen::VectorXf ksi_vector;
+		void data_load(void);
         float** estimate_signal_buf;
         void parameter_read(void);
+        Eigen::MatrixXf frame_shift(Eigen::MatrixXf mat);
+        void algorithm_init(void);
         //template<class T>
         //friend bool read_proto_from_text_file<T>(const std::string &file_name, T *proto);
         void window_generate(void);
