@@ -7,6 +7,9 @@
 
 #ifndef _IVA_H
 #define _IVA_H
+#ifndef SOURCE_NUM
+#define SOURCE_NUM 2
+#endif
 #include "Eigen/Dense"
 #include "unsupported/Eigen/FFT"
 #include <iostream>
@@ -24,6 +27,7 @@ namespace iva
 	{
     public:
         iva();
+        iva(std::string config_path_);
         iva(std::string config_path_, std::string data_path_);
 		~iva();
         //for every single signal, call this approach
@@ -66,6 +70,7 @@ namespace iva
         
         bool current_batch_finish_process_flag;
         bool current_batch_finish_prepare_flag;
+        bool no_data;
         Eigen::MatrixXf signal_buf_prepare,signal_buf_process,signal_buf_estimate,signal_buf_estimate_overlap;
         Eigen::MatrixXf I_matrix;
         Eigen::MatrixXf zero_matrix;
@@ -87,6 +92,7 @@ namespace iva
     {
     public:
         iva_optimized();
+        iva_optimized(std::string config_path_);
         iva_optimized(std::string config_path_, std::string data_path_);
         ~iva_optimized();
         //for every single signal, call this approach
@@ -113,6 +119,7 @@ namespace iva
         int window_type;
         int time_points;
         bool is_debug;
+        bool no_data;
         int source_num;
         int buffer_size_now;
         bool if_read_data;

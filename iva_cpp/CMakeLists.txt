@@ -80,4 +80,8 @@ target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 set(lib_src_lists iva.cpp ${PROTO_SRCS} ${PROTO_HDRS})
 add_library(${PROJECT_NAME}_lib SHARED ${lib_src_lists})
 target_link_libraries(${PROJECT_NAME}_lib ${PROTOBUF_LIBRARIES})
+INSTALL(TARGETS ${PROJECT_NAME}_lib 
+		LIBRARY DESTINATION lib				
+		)
+install(FILES ${PROJECT_SOURCE_DIR}/iva.h DESTINATION include/iva)
 

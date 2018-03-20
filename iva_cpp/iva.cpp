@@ -14,6 +14,14 @@ iva::iva::iva()
 {
 	proto_path = PROTO_CONFIG_PATH;
     data_path  = PROTO_DATA_PATH;
+    no_data    = false;
+    algorithm_init();
+}
+
+iva::iva::iva(std::string config_path_)
+{
+    proto_path = config_path_;
+    no_data    = true;
     algorithm_init();
 }
 
@@ -21,6 +29,7 @@ iva::iva::iva(std::string config_path_, std::string data_path_)
 {
 	proto_path = config_path_;
     data_path  = data_path_;
+    no_data    = false;
     algorithm_init();
 }
 
@@ -150,6 +159,8 @@ void iva::iva::window_generate(void)
 
 float** iva::iva::get_current_batch(void)
 {
+    if (!current_batch_finish_process_flag)
+        return NULL;
     current_batch_finish_process_flag = false;
 	return estimate_signal_buf;
 }
@@ -178,6 +189,10 @@ void iva::iva::parameter_read(void)
 	source_num  = config.source_num();
     if_read_data= config.if_read_data();
     sample_rate = config.sample_rate();
+    if (no_data)
+    {
+        if_read_data = 0;
+    }
 }
 void iva::iva::data_load(void)
 {
@@ -258,7 +273,10 @@ std::string iva::iva::get_config_path(void)
 
 float** iva::iva::get_raw_data(void)
 {
-    
+    if (no_data)
+    {
+        throw no_data;
+    }
     return raw_data;
 }
 int iva::iva::get_source_num(void)
@@ -324,6 +342,14 @@ iva::iva_optimized::iva_optimized()
 {
     proto_path = PROTO_CONFIG_PATH;
     data_path  = PROTO_DATA_PATH;
+    no_data    = false;
+    algorithm_init();
+}
+
+iva::iva_optimized::iva_optimized(std::string config_path_)
+{
+    proto_path = config_path_;
+    no_data    = true;
     algorithm_init();
 }
 
@@ -331,6 +357,7 @@ iva::iva_optimized::iva_optimized(std::string config_path_, std::string data_pat
 {
     proto_path = config_path_;
     data_path  = data_path_;
+    no_data    = false;
     algorithm_init();
 }
 
@@ -463,6 +490,8 @@ void iva::iva_optimized::window_generate(void)
 
 float** iva::iva_optimized::get_current_batch(void)
 {
+    if (!current_batch_finish_process_flag)
+        return NULL;
     current_batch_finish_process_flag = false;
     return estimate_signal_buf;
 }
@@ -493,6 +522,10 @@ void iva::iva_optimized::parameter_read(void)
         throw source_num;
     if_read_data= config.if_read_data();
     sample_rate = config.sample_rate();
+    if (no_data)
+    {
+        if_read_data = false;
+    }
 }
 void iva::iva_optimized::data_load(void)
 {
@@ -552,7 +585,10 @@ std::string iva::iva_optimized::get_config_path(void)
 
 float** iva::iva_optimized::get_raw_data(void)
 {
-    
+    if (no_data)
+    {
+        throw no_data;
+    }
     return raw_data;
 }
 int iva::iva_optimized::get_source_num(void)
