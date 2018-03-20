@@ -5,7 +5,7 @@ IVA library is based on Eigen3 and Google ProtoBuf, and compiled in cmake, so in
 Install the dependencies on Ubuntu
 ----
 ```shell
-sudo apt-get install protobuf-compiler libprotobuf-dev libeigen3-dev cmake
+sudo apt-get install protobuf-compiler libprotobuf-dev libeigen3-dev cmake3
 ```
 
 
