@@ -43,6 +43,7 @@ iva::iva::~iva()
     }
     for (int i=0;i<shift_size;i++) free((void *)estimate_signal_buf[i]);
     free((void *)estimate_signal_buf);
+    free((void *) input_data_ptr);
 }
 
 void iva::iva::process(void)
@@ -111,7 +112,56 @@ void iva::iva::data_prepare(std::vector<float> signal_mixed)
         signal_buf_prepare(buffer_size_now,i) = signal_mixed[i];
     }
     buffer_size_now++;
-    Eigen::MatrixXf tmp_matrix = signal_buf_process;
+    if (buffer_size_now == shift_size)
+    {
+        signal_buf_process = frame_shift(signal_buf_process);
+        for (int i = fft_length-shift_size;i<fft_length;i++)
+        {
+            signal_buf_process.row(i) = signal_buf_prepare.row(i-(fft_length-shift_size));
+        }
+        
+        
+        if (current_batch_finish_prepare_flag)
+        {
+            std::cout<<"last data will be abandoned\n";
+        }
+        current_batch_finish_prepare_flag = true;
+        buffer_size_now = 0;
+    }
+}
+
+void iva::iva::data_prepare(void)
+{
+    for (int i=0;i<source_num;i++)
+    {
+        signal_buf_prepare(buffer_size_now,i) = input_data_ptr[i];
+    }
+    buffer_size_now++;
+    if (buffer_size_now == shift_size)
+    {
+        signal_buf_process = frame_shift(signal_buf_process);
+        for (int i = fft_length-shift_size;i<fft_length;i++)
+        {
+            signal_buf_process.row(i) = signal_buf_prepare.row(i-(fft_length-shift_size));
+        }
+        
+        
+        if (current_batch_finish_prepare_flag)
+        {
+            std::cout<<"last data will be abandoned\n";
+        }
+        current_batch_finish_prepare_flag = true;
+        buffer_size_now = 0;
+    }
+}
+
+void iva::iva::data_prepare(float * data_buffer_)
+{
+    for (int i=0;i<source_num;i++)
+    {
+        signal_buf_prepare(buffer_size_now,i) = data_buffer_[i];
+    }
+    buffer_size_now++;
     if (buffer_size_now == shift_size)
     {
         signal_buf_process = frame_shift(signal_buf_process);
@@ -322,6 +372,11 @@ void iva::iva::algorithm_init(void)
     r_matrix_diag = unmix_matrix;
     norm_matrix = unmix_matrix;
     I_matrix = Eigen::MatrixXf::Identity(source_num,source_num);
+    input_data_ptr = (float*)malloc(source_num * sizeof(float));
+}
+float *iva::iva::get_input_ptr(void)
+{
+    return input_data_ptr;
 }
 
 int iva::iva::get_shift_size(void)
@@ -371,6 +426,8 @@ iva::iva_optimized::~iva_optimized()
     }
     for (int i=0;i<shift_size;i++) free((void *)estimate_signal_buf[i]);
     free((void *)estimate_signal_buf);
+    free((void *)input_data_ptr);
+
 }
 
 void iva::iva_optimized::process(void)
@@ -442,7 +499,56 @@ void iva::iva_optimized::data_prepare(std::vector<float> signal_mixed)
         signal_buf_prepare(buffer_size_now,i) = signal_mixed[i];
     }
     buffer_size_now++;
-    Eigen::MatrixXf tmp_matrix = signal_buf_process;
+    if (buffer_size_now == shift_size)
+    {
+        signal_buf_process = frame_shift(signal_buf_process);
+        for (int i = fft_length-shift_size;i<fft_length;i++)
+        {
+            signal_buf_process.row(i) = signal_buf_prepare.row(i-(fft_length-shift_size));
+        }
+        
+        
+        if (current_batch_finish_prepare_flag)
+        {
+            std::cout<<"last data will be abandoned\n";
+        }
+        current_batch_finish_prepare_flag = true;
+        buffer_size_now = 0;
+    }
+}
+
+void iva::iva_optimized::data_prepare(void)
+{
+    for (int i=0;i<source_num;i++)
+    {
+        signal_buf_prepare(buffer_size_now,i) = input_data_ptr[i];
+    }
+    buffer_size_now++;
+    if (buffer_size_now == shift_size)
+    {
+        signal_buf_process = frame_shift(signal_buf_process);
+        for (int i = fft_length-shift_size;i<fft_length;i++)
+        {
+            signal_buf_process.row(i) = signal_buf_prepare.row(i-(fft_length-shift_size));
+        }
+        
+        
+        if (current_batch_finish_prepare_flag)
+        {
+            std::cout<<"last data will be abandoned\n";
+        }
+        current_batch_finish_prepare_flag = true;
+        buffer_size_now = 0;
+    }
+}
+
+void iva::iva_optimized::data_prepare(float * data_buffer_)
+{
+    for (int i=0;i<source_num;i++)
+    {
+        signal_buf_prepare(buffer_size_now,i) = data_buffer_[i];
+    }
+    buffer_size_now++;
     if (buffer_size_now == shift_size)
     {
         signal_buf_process = frame_shift(signal_buf_process);
@@ -635,6 +741,12 @@ void iva::iva_optimized::algorithm_init(void)
     r_matrix_diag = unmix_matrix;
     norm_matrix = unmix_matrix;
     I_matrix = Eigen::Matrix<float, SOURCE_NUM, SOURCE_NUM>::Identity();
+    input_data_ptr = (float*)malloc(SOURCE_NUM * sizeof(float));
+}
+
+float *iva::iva_optimized::get_input_ptr(void)
+{
+    return input_data_ptr;
 }
 
 int iva::iva_optimized::get_shift_size(void)

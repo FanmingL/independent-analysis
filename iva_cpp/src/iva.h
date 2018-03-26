@@ -39,6 +39,8 @@ namespace iva
         bool is_debug_mode(void);
         void print_parameter(void);
         void data_prepare(std::vector<float> signal_mixed);
+        void data_prepare(void);
+        void data_prepare(float * data_buffer_);
         std::string get_data_path(void);
         std::string get_config_path(void);
         float** get_raw_data(void);
@@ -46,10 +48,12 @@ namespace iva
         int get_time_points(void);
         int get_shift_size(void);
         float get_sample_rate(void);
+        float* get_input_ptr(void);
     private:
         
         float beta;
         float eta;
+        float *input_data_ptr;
         int fft_length;
         int shift_size;
         int window_type;
@@ -104,6 +108,8 @@ namespace iva
         bool is_debug_mode(void);
         void print_parameter(void);
         void data_prepare(std::vector<float> signal_mixed);
+        void data_prepare(void);
+        void data_prepare(float * data_buffer_);
         std::string get_data_path(void);
         std::string get_config_path(void);
         float** get_raw_data(void);
@@ -111,9 +117,11 @@ namespace iva
         int get_time_points(void);
         int get_shift_size(void);
         float  get_sample_rate(void);
+        float* get_input_ptr(void);
     private:
         float beta;
         float eta;
+        float *input_data_ptr;
         int fft_length;
         int shift_size;
         int window_type;

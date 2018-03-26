@@ -16,6 +16,7 @@ int main(int argc, char** argv)
     int source_num = iva_algorithm.get_source_num();
     int time_points =iva_algorithm.get_time_points();
     int shift_size = iva_algorithm.get_shift_size();
+    float *data_input_ptr = iva_algorithm.get_input_ptr();
 	//int source_num_defined = SOURCE_NUM;
     std::ofstream outfile;
     std::string data_path_out = iva_algorithm.get_data_path();
@@ -23,17 +24,15 @@ int main(int argc, char** argv)
     outfile.open(data_path_out);
     if(!outfile) std::cout<<"error"<<std::endl;
     std::cout<<"audio last about "<<time_points/iva_algorithm.get_sample_rate()<<" seconds"<<std::endl;
-	//std::cout<<"sources number defined is " << SOURCE_NUM <<" \n ";
    	time_t now,end;
 	now = time(NULL);
     for (int i = 0;i<time_points;i++)
     {
-        std::vector<float> current_observed(source_num,0);
         for (int s = 0;s<source_num;s++)
         {
-            current_observed[s] = raw_data[i][s];
+            data_input_ptr[s] = raw_data[i][s];
         }
-        iva_algorithm.data_prepare(current_observed);
+        iva_algorithm.data_prepare();
         iva_algorithm.process();
         if (iva_algorithm.is_processed())
         {
