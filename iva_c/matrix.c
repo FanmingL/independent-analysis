@@ -129,6 +129,7 @@ void matf_reallocate(MatfP _data, int size_in, int rows, int cols, int _size)
         for (i=0; i<rows; i++)
         {
             MY_MEM_ALLOCATE(*((_data + _size - 1)->data + i), cols, float);
+            memset(*((_data + _size - 1)->data + i), 0, sizeof(float) * cols);
         }
     }
 #if ENABLE_ASSERT
@@ -204,6 +205,20 @@ MatfP matf_eye(int rows, int cols)
     for(row = 0; row < MY_MIN(rows, cols); row++)
     {
         _data->data[row][row] = 1;
+    }
+    return _data;
+}
+
+MatfP matf_zeros_n(int rows, int cols, int sizes)
+{
+    MatfP _data = matf_create(rows, cols, sizes);
+    int row, size;
+    for (size=0; size < sizes; size ++)
+    {
+        for (row = 0; row < rows; row++)
+        {
+            memset((_data + size)->data[row], 0, cols * sizeof(float));
+        }
     }
     return _data;
 }
@@ -307,6 +322,27 @@ MatfP matf_cwise_mul(MatfP _a, MatfP _b, MatfP _out)
         for (col = 0; col < _a->cols; col++)
         {
             _out->data[row][col] = _a->data[row][col] * _b->data[row][col];
+        }
+    }
+    return _out;
+}
+
+MatfP matf_row_mul(MatfP _a, MatfP _b, MatfP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->rows == _b->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            _out->data[row][col] = _a->data[row][col] * _b->data[row][0];
         }
     }
     return _out;
@@ -735,6 +771,20 @@ MatcP matc_eye_n(int rows, int cols, int sizes)
     return _data;
 }
 
+MatcP matc_zeros_n(int rows, int cols, int sizes)
+{
+    MatcP _data = matc_create(rows, cols, sizes);
+    int row, size;
+    for (size=0; size < sizes; size ++)
+    {
+        for (row = 0; row < rows; row++)
+        {
+            memset((_data + size)->data[row], 0, cols * sizeof(c_num));
+        }
+    }
+    return _data;
+}
+
 //free and allocate
 void matc_reallocate(MatcP _data, int size_in, int rows, int cols, int _size)
 {
@@ -767,6 +817,54 @@ void matc_reallocate(MatcP _data, int size_in, int rows, int cols, int _size)
 #if ENABLE_ASSERT
     printf("it's %d times that size is not  appropriate\n\n", ++sequence);
 #endif
+}
+
+//free and allocate
+void matc_resize(MatcP _data, int rows, int cols)
+{
+#if ENABLE_ASSERT
+    assert(_data != NULL);
+#endif
+    int i;
+    i = _data->rows;
+    for (; i > 0; i-- )
+    {
+        free((void *)(*(_data->data + i - 1)));
+    }
+    free((void * )(_data->data));
+
+    _data->cols = cols;
+    _data->rows = rows;
+    MY_MEM_ALLOCATE(_data->data, rows, c_num*);
+    for (i=0; i<rows; i++)
+    {
+        MY_MEM_ALLOCATE(*(_data->data + i), cols, c_num);
+        memset(*(_data->data + i), 0, sizeof(c_num) * cols);
+    }
+}
+
+//free and allocate
+void matf_resize(MatfP _data, int rows, int cols)
+{
+#if ENABLE_ASSERT
+    assert(_data != NULL);
+#endif
+    int i;
+    i = _data->rows;
+    for (; i > 0; i-- )
+    {
+        free((void *)(*(_data->data + i - 1)));
+    }
+    free((void * )(_data->data));
+    
+    _data->cols = cols;
+    _data->rows = rows;
+    MY_MEM_ALLOCATE(_data->data, rows, float*);
+    for (i=0; i<rows; i++)
+    {
+        MY_MEM_ALLOCATE(*(_data->data + i), cols, float);
+        memset(*(_data->data + i), 0, sizeof(float) * cols);
+    }
 }
 
 //_out = _a + _b
@@ -1167,6 +1265,186 @@ MatcP matc_conj(MatcP _a, MatcP _out)
     return _out;
 }
 
+MatcP matc_real_mul(MatcP _a, float _b, MatcP _out)
+{
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for(col = 0; col < _a->cols; col++)
+        {
+            c_real_mul(&(_a->data[row][col]), _b, &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+MatcP matc_real_cwise_mul(MatcP _a, MatfP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->rows==_b->rows);
+    assert(_a->cols==_b->cols);
+#endif
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for(col = 0; col < _a->cols; col++)
+        {
+            c_real_mul(&(_a->data[row][col]), (_b->data[row][col]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+MatcP matc_real_row_mul(MatcP _a, MatfP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->rows==_b->rows);
+#endif
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for(col = 0; col < _a->cols; col++)
+        {
+            c_real_mul(&(_a->data[row][col]), (_b->data[row][0]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+int __BASE_NUM_REAL__, __BASE_NUM_COMPLEX__, __MAX_SIZE_REAL__, __MAX_SIZE_COMPLEX__;
+Matf *__REAL_BASE__;
+Matc *__COMPLEX_BASE__;
+int __MATRICE_INTI__=0;
+
+int matrice_sys_init(int max_size_real, int max_size_complex)
+{
+    if (__MATRICE_INTI__==0)
+    {
+        __BASE_NUM_REAL__           = 0;
+        __BASE_NUM_COMPLEX__        = 0;
+        __REAL_BASE__               = matf_zeros_n(1, 1, max_size_real);
+        __COMPLEX_BASE__            = matc_zeros_n(1, 1, max_size_complex);
+        __MAX_SIZE_REAL__           = max_size_real;
+        __MAX_SIZE_COMPLEX__        = max_size_complex;
+        __MATRICE_INTI__            = 1;
+        srand((unsigned) time(NULL));
+        return 0;
+    }
+    return 1;
+}
+
+void matrice_sys_exit(void)
+{
+    if (__MATRICE_INTI__==1)
+    {
+        free_matf(__REAL_BASE__, __MAX_SIZE_REAL__);
+        free_matc(__COMPLEX_BASE__, __MAX_SIZE_COMPLEX__);
+        __BASE_NUM_REAL__           = 0;
+        __BASE_NUM_COMPLEX__        = 0;
+        __MAX_SIZE_REAL__           = 0;
+        __MAX_SIZE_COMPLEX__        = 0;
+        __MATRICE_INTI__            = 0;
+    }
+}
+
+void matc_set_zeros(MatcP _data)
+{
+    int row;
+    for (row = 0; row < _data->rows; row++)
+    {
+        memset(_data->data[row], 0, _data->cols * sizeof(c_num));
+    }
+}
+
+void matc_set_eye(MatcP _data)
+{
+    int i = 0;
+    matc_set_zeros(_data);
+    for (;i < MY_MIN(_data->cols, _data->rows); i++)
+    {
+        _data->data[i][i].real = 1;
+    }
+}
+
+void matc_set_all_num(MatcP _data, c_num num)
+{
+    int row, col;
+    for (row = 0; row < _data->rows; row++)
+    {
+        for (col = 0; col < _data->cols; col++)
+        {
+            _data->data[row][col] = num;
+        }
+    }
+}
+
+void matc_set_rand(MatcP _data, int range)
+{
+    int row, col;
+    for (row = 0; row < _data->rows; row++)
+    {
+        for (col = 0; col < _data->cols; col++)
+        {
+            _data->data[row][col].real = rand() % range;
+            _data->data[row][col].imag = rand() % range;
+        }
+    }
+}
+
+void matf_set_zeros(MatfP _data)
+{
+    int row;
+    for (row = 0; row < _data->rows; row++)
+    {
+        memset(_data->data[row], 0, _data->cols * sizeof(float));
+    }
+}
+
+void matf_set_eye(MatfP _data)
+{
+    int i = 0;
+    matf_set_zeros(_data);
+    for (;i < MY_MIN(_data->cols, _data->rows); i++)
+    {
+        _data->data[i][i] = 1;
+    }
+}
+
+void matf_set_all_num(MatfP _data, float num)
+{
+    int row, col;
+    for (row = 0; row < _data->rows; row++)
+    {
+        for (col = 0; col < _data->cols; col++)
+        {
+            _data->data[row][col] = num;
+        }
+    }
+}
+
+void matf_set_rand(MatfP _data, int range)
+{
+    int row, col;
+    for (row = 0; row < _data->rows; row++)
+    {
+        for (col = 0; col < _data->cols; col++)
+        {
+            _data->data[row][col] = rand() % range;
+        }
+    }
+}
 
 
 

@@ -9,11 +9,27 @@
 #define _MATRIX_H
 #include "stdlib.h"
 #include "string.h"
+#include "time.h"
 #define MY_MEM_ALLOCATE(VAR_PTR, NUM, TYPE)  {VAR_PTR = ((TYPE*)(malloc((NUM) * sizeof(TYPE))));}
 #define ENABLE_ASSERT 1
-#if ENABLE_ASSERT
 #include <assert.h>
-#endif
+
+
+
+#define NEW_MAT_REAL(name, row, col)        \
+                                            assert(__MATRICE_INTI__ == 1);\
+                                            assert(__BASE_NUM_REAL__ < __MAX_SIZE_REAL__);\
+                                            matf_resize(__REAL_BASE__ + __BASE_NUM_REAL__, row, col);\
+                                            MatfP name =  __REAL_BASE__ + __BASE_NUM_REAL__;\
+                                            __BASE_NUM_REAL__++;\
+
+
+#define NEW_MAT_COMPLEX(name, row, col)    \
+                                            assert(__MATRICE_INTI__ == 1);\
+                                            assert(__BASE_NUM_COMPLEX__ < __MAX_SIZE_COMPLEX__);\
+                                            matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
+                                            MatcP name =  __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
+                                            __BASE_NUM_COMPLEX__++;\
 
 #ifndef M_TWOPI
 # define M_TWOPI       6.2831853071795862319959  /* 2*pi */
@@ -46,6 +62,11 @@ typedef struct
     c_num **data;
 }Matc;
 typedef Matc*const MatcP;
+extern int __BASE_NUM_REAL__, __BASE_NUM_COMPLEX__, __MAX_SIZE_REAL__, __MAX_SIZE_COMPLEX__, __MATRICE_INTI__;
+extern Matf *__REAL_BASE__;
+extern Matc *__COMPLEX_BASE__;
+int matrice_sys_init(int max_size_real, int max_size_complex);
+void matrice_sys_exit(void);
 void c_add(c_num *_a, c_num *_b, c_num *_out);
 void c_set_zero(c_num *_a, int _size);
 void c_sub(c_num *_a, c_num *_b, c_num *_out);
@@ -64,6 +85,7 @@ MatfP matf_zeros(int rows, int cols);
 MatfP matf_ones(int rows, int cols);
 MatfP matf_eye(int rows, int cols);
 MatfP matf_eye_n(int rows, int cols, int sizes);
+MatfP matf_zeros_n(int rows, int cols, int sizes);
 void print_matf(MatfP _data, int _size);
 MatfP matf_sub(MatfP _a, MatfP _b, MatfP _out);
 MatfP matf_cwise_mul(MatfP _a, MatfP _b, MatfP _out);
@@ -75,6 +97,7 @@ MatfP matf_real_mul(MatfP _a, float _b, MatfP _out);
 void matf_reallocate(MatfP _data, int size_in, int rows, int cols, int _size);
 MatfP matf_copy(MatfP _a, MatfP _out);
 MatfP matf_transpose(MatfP _a, MatfP _out);
+MatfP matf_row_mul(MatfP _a, MatfP _b, MatfP _out);
 void swap(float *_a, float *_b);
 void matf_LU_compose(MatfP _a, MatfP _out_L, MatfP _out_U);
 MatfP matf_inverse(MatfP _a, MatfP _out);
@@ -86,17 +109,31 @@ MatcP matc_zeros(int rows, int cols);
 MatcP matc_ones(int rows, int cols);
 MatcP matc_eye(int rows, int cols);
 MatcP matc_eye_n(int rows, int cols, int sizes);
+MatcP matc_zeros_n(int rows, int cols, int sizes);
 void matc_reallocate(MatcP _data, int size_in, int rows, int cols, int _size);
 MatcP matc_add(MatcP _a, MatcP _b, MatcP _out);
 MatcP matc_sub(MatcP _a, MatcP _b, MatcP _out);
 MatcP matc_cwise_mul(MatcP _a, MatcP _b, MatcP _out);
 MatcP matc_complex_mul(MatcP _a, c_num *_b, MatcP _out);
 MatcP matc_complex_div(MatcP _a, c_num *_b,MatcP _out);
+MatcP matc_real_mul(MatcP _a, float _b, MatcP _out);
 MatcP matc_cwise_div(MatcP _a, MatcP _b, MatcP _out);
+MatcP matc_real_cwise_mul(MatcP _a, MatfP _b, MatcP _out);
+MatcP matc_real_row_mul(MatcP _a, MatfP _b, MatcP _out);
 MatcP matc_mul(MatcP _a, MatcP _b,MatcP _out);
 void matc_LU_compose(MatcP _a, MatcP _out_L, MatcP _out_U);
 MatcP matc_inverse(MatcP _a, MatcP _out);
 c_num matc_det(MatcP _a);
 MatcP matc_transpose(MatcP _a, MatcP _out);
 MatcP matc_conj(MatcP _a, MatcP _out);
+void matc_resize(MatcP _data, int rows, int cols);
+void matf_resize(MatfP _data, int rows, int cols);
+void matc_set_zeros(MatcP _data);
+void matc_set_eye(MatcP _data);
+void matc_set_all_num(MatcP _data, c_num num);
+void matf_set_zeros(MatfP _data);
+void matf_set_eye(MatfP _data);
+void matf_set_all_num(MatfP _data, float num);
+void matc_set_rand(MatcP _data, int range);
+void matf_set_rand(MatfP _data, int range);
 #endif
