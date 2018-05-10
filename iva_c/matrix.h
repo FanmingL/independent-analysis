@@ -10,7 +10,7 @@
 #include "stdlib.h"
 #include "string.h"
 #define MY_MEM_ALLOCATE(VAR_PTR, NUM, TYPE)  {VAR_PTR = ((TYPE*)(malloc((NUM) * sizeof(TYPE))));}
-#define ENABLE_ASSERT 0
+#define ENABLE_ASSERT 1
 #if ENABLE_ASSERT
 #include <assert.h>
 #endif
@@ -45,11 +45,13 @@ typedef struct
     float rows;
     c_num **data;
 }Matc;
-
+typedef Matc*const MatcP;
 void c_add(c_num *_a, c_num *_b, c_num *_out);
+void c_set_zero(c_num *_a, int _size);
 void c_sub(c_num *_a, c_num *_b, c_num *_out);
 void c_mul(c_num *_a, c_num *_b, c_num *_out);
 void c_div(c_num *_a, c_num *_b, c_num *_out);
+void c_conj(c_num *_a, c_num *out);
 void c_real_mul(c_num *_a, float _b, c_num *_out);
 void c_real_div(c_num *_a, float _b, c_num *_out);
 void real_c_div(float _a, c_num *_b, c_num *out);
@@ -77,4 +79,24 @@ void swap(float *_a, float *_b);
 void matf_LU_compose(MatfP _a, MatfP _out_L, MatfP _out_U);
 MatfP matf_inverse(MatfP _a, MatfP _out);
 float matf_det(MatfP _a);
+MatcP matc_create(int rows, int cols, int _size);
+void free_matc(MatcP _mat, int _size);
+void print_matc(MatcP _data, int _size);
+MatcP matc_zeros(int rows, int cols);
+MatcP matc_ones(int rows, int cols);
+MatcP matc_eye(int rows, int cols);
+MatcP matc_eye_n(int rows, int cols, int sizes);
+void matc_reallocate(MatcP _data, int size_in, int rows, int cols, int _size);
+MatcP matc_add(MatcP _a, MatcP _b, MatcP _out);
+MatcP matc_sub(MatcP _a, MatcP _b, MatcP _out);
+MatcP matc_cwise_mul(MatcP _a, MatcP _b, MatcP _out);
+MatcP matc_complex_mul(MatcP _a, c_num *_b, MatcP _out);
+MatcP matc_complex_div(MatcP _a, c_num *_b,MatcP _out);
+MatcP matc_cwise_div(MatcP _a, MatcP _b, MatcP _out);
+MatcP matc_mul(MatcP _a, MatcP _b,MatcP _out);
+void matc_LU_compose(MatcP _a, MatcP _out_L, MatcP _out_U);
+MatcP matc_inverse(MatcP _a, MatcP _out);
+c_num matc_det(MatcP _a);
+MatcP matc_transpose(MatcP _a, MatcP _out);
+MatcP matc_conj(MatcP _a, MatcP _out);
 #endif

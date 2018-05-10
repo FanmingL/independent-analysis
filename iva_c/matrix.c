@@ -14,6 +14,12 @@ void c_add(c_num *_a, c_num *_b, c_num *_out)
     _out->imag = _a->imag + _b->imag;
 }
 
+// _a = 0 + 0i;
+void c_set_zero(c_num *_a, int _size)
+{
+    memset(_a, 0, _size * sizeof(c_num));
+}
+
 //_out = _a - _b
 void c_sub(c_num *_a, c_num *_b, c_num *_out)
 {
@@ -59,13 +65,20 @@ void c_div(c_num *_a, c_num *_b, c_num *out)
     out->imag = (_a->imag * _b->real - _a->real * _b->imag ) / sum_temp;
 }
 
+//_out = conj(_a)
+void c_conj(c_num *_a, c_num *out)
+{
+    out->real = _a->real;
+    out->imag = -_a->imag;
+}
+
 //print the number
 void c_print(c_num *_num)
 {
     if (_num->imag >= 0)
-    printf("%.2f + %.2fi ", _num->real, _num->imag);
+    printf("%.2f + %.2fi, ", _num->real, _num->imag);
     else
-    printf("%.2f - %.2fi ", _num->real, -_num->imag);
+    printf("%.2f - %.2fi, ", _num->real, -_num->imag);
 }
 
 //print the number with \n
@@ -593,7 +606,6 @@ float matf_det(MatfP _a)
             }
             U->data[i][j] = _a->data[i][j] - s;
         }
-        
         for (j = i + 1;j < N;j++)
         {
             s = 0;
@@ -613,4 +625,548 @@ float matf_det(MatfP _a)
     free_matf(U, 1);
     return out;
 }
+
+
+//create a complex matrix
+MatcP matc_create(int rows, int cols, int _size)
+{
+    Matc *_data;
+    int i;
+    MY_MEM_ALLOCATE(_data, _size, Matc);
+    for (;_size>0;_size--)
+    {
+        (_data + _size - 1)->cols = cols;
+        (_data + _size - 1)->rows = rows;
+        MY_MEM_ALLOCATE((_data + _size - 1)->data, rows, c_num*);
+        for (i=0; i<rows; i++)
+        {
+            MY_MEM_ALLOCATE(*((_data + _size - 1)->data + i), cols, c_num);
+        }
+    }
+    return _data;
+}
+
+//free a matrix ptr
+void free_matc(MatcP _mat, int _size)
+{
+    int _row;
+    
+    for (; _size>0; _size--)
+    {
+        _row = (_size + _mat - 1)->rows;
+        for (; _row > 0; _row-- )
+        {
+            free((void *)(*((_mat + _size - 1)->data + _row - 1)));
+        }
+        free((void * )(_mat + _size - 1)->data);
+    }
+    free((void *)_mat);
+}
+
+void print_matc(MatcP _data, int _size)
+{
+    int size, col, row;
+    for (size = 0; size < _size; size++)
+    {
+        for (row = 0; row < (_data + size)->rows; row++)
+        {
+            for (col = 0; col < (_data + size)->cols; col++)
+            {
+                c_print(&(_data->data[row][col]));
+            }
+            printf(";\n");
+        }
+        printf("\n\n");
+    }
+}
+
+//_out = zeros(rows, cols)
+MatcP matc_zeros(int rows, int cols)
+{
+    MatcP _data = matc_create(rows, cols, 1);
+    for (;rows>0;rows--)
+        memset(_data->data[rows - 1], 0, cols*sizeof(c_num));
+    return _data;
+}
+
+//_out = ones(rows, cols)
+MatcP matc_ones(int rows, int cols)
+{
+    MatcP _data = matc_create(rows, cols, 1);
+    int col, row;
+    for (row = 0; row < rows; row++)
+    {
+        for (col = 0; col < cols; col++)
+        {
+            _data->data[row][col].real = 1;
+            _data->data[row][col].imag = 0;
+        }
+    }
+    return _data;
+}
+
+//_out = eye(rows, cols)
+MatcP matc_eye(int rows, int cols)
+{
+    MatcP _data = matc_zeros(rows, cols);
+    int row;
+    for(row = 0; row < MY_MIN(rows, cols); row++)
+    {
+        _data->data[row][row].real = 1;
+    }
+    return _data;
+}
+
+MatcP matc_eye_n(int rows, int cols, int sizes)
+{
+    MatcP _data = matc_create(rows, cols, sizes);
+    int row, size;
+    for (size=0; size < sizes; size ++)
+    {
+        for (row = 0; row < rows; row++)
+        {
+            memset((_data + size)->data[row], 0, cols * sizeof(c_num));
+        }
+        for(row = 0; row < MY_MIN(rows, cols); row++)
+        {
+            (_data + size)->data[row][row].real = 1;
+        }
+    }
+    return _data;
+}
+
+//free and allocate
+void matc_reallocate(MatcP _data, int size_in, int rows, int cols, int _size)
+{
+#if ENABLE_ASSERT
+    static int sequence = 0;
+#endif
+    int i;
+    for (; size_in>0; size_in--)
+    {
+        i = (size_in + _data - 1)->rows;
+        for (; i > 0; i-- )
+        {
+            free((void *)(*((_data + size_in - 1)->data + i - 1)));
+        }
+        free((void * )(_data + size_in - 1)->data);
+    }
+    
+    for (;_size>0;_size--)
+    {
+        (_data + _size - 1)->cols = cols;
+        (_data + _size - 1)->rows = rows;
+        MY_MEM_ALLOCATE((_data + _size - 1)->data, rows, c_num*);
+        for (i=0; i<rows; i++)
+        {
+            MY_MEM_ALLOCATE(*((_data + _size - 1)->data + i), cols, c_num);
+            memset(*((_data + _size - 1)->data + i), 0, sizeof(c_num) * cols);
+        }
+        
+    }
+#if ENABLE_ASSERT
+    printf("it's %d times that size is not  appropriate\n\n", ++sequence);
+#endif
+}
+
+//_out = _a + _b
+MatcP matc_add(MatcP _a, MatcP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _b->cols);
+    assert(_a->rows == _b->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_add(&(_a->data[row][col]), &(_b->data[row][col]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = _a - _b
+MatcP matc_sub(MatcP _a, MatcP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _b->cols);
+    assert(_a->rows == _b->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_sub(&(_a->data[row][col]), &(_b->data[row][col]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = _a .* _b
+MatcP matc_cwise_mul(MatcP _a, MatcP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _b->cols);
+    assert(_a->rows == _b->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_mul(&(_a->data[row][col]), &(_b->data[row][col]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = _a * _b
+MatcP matc_complex_mul(MatcP _a, c_num *_b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _out->cols);
+    assert(_a->rows == _out->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_sub(&(_a->data[row][col]), (_b), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = _a / _b
+MatcP matc_complex_div(MatcP _a, c_num *_b,MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _out->cols);
+    assert(_a->rows == _out->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    c_num _temp;
+    c_real_div(_b, 1, &_temp);
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_mul(&(_a->data[row][col]), &(_temp), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = _a ./ _b
+MatcP matc_cwise_div(MatcP _a, MatcP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _b->cols);
+    assert(_a->rows == _b->rows);
+    assert(_out != NULL);
+#endif
+    int col, row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_sub(&(_a->data[row][col]), &(_b->data[row][col]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = _a * _b
+MatcP matc_mul(MatcP _a, MatcP _b,MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _b->rows);
+    assert(_out != NULL);
+#endif
+    int row, col, mul_index;
+    c_num _temp;
+    if (_out->rows != _a->rows || _out->cols != _b->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _b->cols, 1);
+    }
+    
+    for (row = 0; row < _out->rows; row++)
+    {
+        
+        for (col = 0; col < _out->cols; col++)
+        {
+            memset(&(_out->data[row][col]), 0, sizeof(c_num));
+            
+            for (mul_index = 0; mul_index < _a->cols; mul_index++)
+            {
+                c_mul(&(_a->data[row][mul_index]), &(_b->data[mul_index][col]), &(_temp));
+                c_add(&_temp, &(_out->data[row][col]), &(_out->data[row][col]));
+            }
+        }
+    }
+    return _out;
+}
+
+void matc_LU_compose(MatcP _a, MatcP _out_L, MatcP _out_U)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols==_a->rows);
+#endif
+    int i, j, k, N=_a->rows;
+    c_num s1, s2;
+    if (_out_U->rows != _a->rows || _out_U->cols != _a->cols)
+    {
+        matc_reallocate(_out_U, 1, _a->rows, _a->cols, 1);
+    }
+    if (_out_L->rows != _a->rows || _out_L->cols != _a->cols)
+    {
+        matc_reallocate(_out_L, 1, _a->rows, _a->cols, 1);
+    }
+    
+    for (i = 0; i < N; i++)
+    {
+        memset(_out_L->data[i], 0, N * sizeof(c_num));
+        memset(_out_U->data[i], 0, N * sizeof(c_num));
+    }
+    /* here start caculate the L and U, det(L) = 1, det(U) = det(A), A = L*U, A^-1 = U^-1*L^-1 */
+    for (i = 0; i < N;i++)
+    {
+        _out_L->data[i][i].real = 1;
+    }
+    
+    for (i = 0;i < N;i++)
+    {
+        for (j = i;j < N;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0;k < i;k++)
+            {
+                c_mul(&(_out_L->data[i][k]), &(_out_U->data[k][j]), &(s2));
+                c_add(&(s2), &(s1), &s1);
+            }
+            c_sub(&(_a->data[i][j]), &(s1), &(_out_U->data[i][j]));
+        }
+        
+        for (j = i + 1;j < N;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0; k < i; k++)
+            {
+                c_mul(&(_out_L->data[j][k]), &(_out_U->data[k][i]), &(s2));
+                c_add(&(s2), &(s1), &s1);
+            }
+            c_sub(&(_a->data[j][i]), &(s1), &(s2));
+            c_div(&(s2), &(_out_U->data[i][i]), &(_out_L->data[j][i]));
+        }
+    }
+}
+
+
+MatcP matc_inverse(MatcP _a, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->rows==_a->cols);
+#endif
+    int N = _a->rows;
+    int i, j, k;
+    c_num s1, s2;
+    MatcP L = matc_eye(N, N),
+    L_inverse = matc_eye(N, N),
+    U = matc_zeros(N, N),
+    U_inverse = matc_zeros(N, N);
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    /* here start caculate the L and U, det(L) = 1, det(U) = det(A), A = L*U, A^-1 = U^-1*L^-1 */
+    for (i = 0;i < N;i++)
+    {
+        for (j = i;j < N;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0;k < i;k++)
+            {
+                c_mul(&(L->data[i][k]), &(U->data[k][j]), &(s2));
+                c_add(&(s2), &(s1), &s1);
+            }
+            c_sub(&(_a->data[i][j]), &(s1), &(U->data[i][j]));
+        }
+        
+        for (j = i + 1;j < N;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0; k < i; k++)
+            {
+                c_mul(&(L->data[j][k]), &(U->data[k][i]), &(s2));
+                c_add(&(s2), &(s1), &s1);
+            }
+            c_sub(&(_a->data[j][i]), &(s1), &(s2));
+            c_div(&(s2), &(U->data[i][i]), &(L->data[j][i]));
+        }
+    }
+#if ENABLE_ASSERT
+    for(i = 0; i < N; i++)
+    {
+        assert(U->data[i][i].real != 0 && U->data[i][i].imag != 0);
+    }
+#endif
+    /* here start caculate the inverse of L */
+    for (i= 1;i < N;i++)
+    {
+        for (j = 0;j < i;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0;k < i;k++)
+            {
+                c_mul(&(L->data[i][k]), &(L_inverse->data[k][j]), &(s2));
+                c_sub(&(s1), &(s2), &s1);
+            }
+            L_inverse->data[i][j] = s1;
+        }
+    }
+    /* here start caculate the inverse of U */
+    for (i = 0;i < N;i++)
+    {
+        real_c_div(1, &(U->data[i][i]), &(U_inverse->data[i][i]));
+    }
+    for (i = 1;i < N;i++)
+    {
+        for (j = i - 1;j >=0;j--)
+        {
+            c_set_zero(&s1, 1);
+            for (k = j + 1;k <= i;k++)
+            {
+                c_mul(&(U->data[j][k]), &(U_inverse->data[k][i]), &(s2));
+                c_sub(&(s1), &(s2), &s1);
+            }
+            c_div(&(s1), &(U->data[j][j]), &(U_inverse->data[j][i]));
+        }
+    }
+    matc_mul(U_inverse, L_inverse, _out);
+    free_matc(L, 1);
+    free_matc(U, 1);
+    free_matc(L_inverse, 1);
+    free_matc(U_inverse, 1);
+    return _out;
+}
+
+c_num matc_det(MatcP _a)
+{
+#if ENABLE_ASSERT
+    assert(_a->rows==_a->cols);
+#endif
+    int N = _a->rows;
+    int i, j, k;
+    c_num s1, s2, _out, temp;
+    
+    MatcP L = matc_eye(N, N),
+    U = matc_zeros(N, N);
+
+    /* here start caculate the L and U, det(L) = 1, det(U) = det(A), A = L*U, A^-1 = U^-1*L^-1 */
+    for (i = 0;i < N;i++)
+    {
+        for (j = i;j < N;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0;k < i;k++)
+            {
+                c_mul(&(L->data[i][k]), &(U->data[k][j]), &(s2));
+                c_add(&(s2), &(s1), &s1);
+            }
+            c_sub(&(_a->data[i][j]), &(s1), &(U->data[i][j]));
+        }
+        
+        for (j = i + 1;j < N;j++)
+        {
+            c_set_zero(&s1, 1);
+            for (k = 0; k < i; k++)
+            {
+                c_mul(&(L->data[j][k]), &(U->data[k][i]), &(s2));
+                c_add(&(s2), &(s1), &s1);
+            }
+            c_sub(&(_a->data[j][i]), &(s1), &(s2));
+            c_div(&(s2), &(U->data[i][i]), &(L->data[j][i]));
+        }
+    }
+    _out.real = 1;
+    _out.imag = 0;
+    for(i = 0; i < N; i++)
+    {
+        c_mul(&_out, &(U->data[i][i]), &temp);
+        _out = temp;
+    }
+    free_matc(L, 1);
+    free_matc(U, 1);
+    return _out;
+}
+
+MatcP matc_transpose(MatcP _a, MatcP _out)
+{
+    int row, col;
+    if (_out->rows != _a->cols || _out->cols != _a->rows)
+    {
+        matc_reallocate(_out, 1, _a->cols, _a->rows, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            _out->data[col][row] = _a->data[row][col];
+        }
+    }
+    return _out;
+}
+
+MatcP matc_conj(MatcP _a, MatcP _out)
+{
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_conj(&(_a->data[row][col]), &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+
+
 
