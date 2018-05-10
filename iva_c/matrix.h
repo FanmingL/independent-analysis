@@ -10,6 +10,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "time.h"
+#include <math.h>
 #define MY_MEM_ALLOCATE(VAR_PTR, NUM, TYPE)  {VAR_PTR = ((TYPE*)(malloc((NUM) * sizeof(TYPE))));}
 #define ENABLE_ASSERT 1
 #include <assert.h>
@@ -57,8 +58,8 @@ typedef struct
 typedef Matf*const MatfP;
 typedef struct
 {
-    float cols;
-    float rows;
+    int cols;
+    int rows;
     c_num **data;
 }Matc;
 typedef Matc*const MatcP;
@@ -136,4 +137,11 @@ void matf_set_eye(MatfP _data);
 void matf_set_all_num(MatfP _data, float num);
 void matc_set_rand(MatcP _data, int range);
 void matf_set_rand(MatfP _data, int range);
+void matf_set_hanning(MatfP hanning_win);
+void matf_set_hamming(MatfP hamming_win);
+void matf_set_rectwin(MatfP rect_win);
+void matf_convert2com(MatfP _a, MatcP _out);
+void matc_set_conj(MatcP _a);
+MatcP matc_copy(MatcP _a, MatcP _out);
+void matc_convert2real(MatcP _a, MatfP _out);
 #endif

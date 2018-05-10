@@ -250,9 +250,9 @@ void print_matf(MatfP _data, int _size)
         {
             for (col = 0; col < (_data + size)->cols; col++)
             {
-                printf("%.2f ",(_data + size)->data[row][col]);
+                printf("%.2f, ",(_data + size)->data[row][col]);
             }
-            printf("\n");
+            printf(";\n");
         }
         printf("\n\n");
     }
@@ -1265,6 +1265,18 @@ MatcP matc_conj(MatcP _a, MatcP _out)
     return _out;
 }
 
+void matc_set_conj(MatcP _a)
+{
+    int row, col;
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            _a->data[row][col].imag = -_a->data[row][col].imag;
+        }
+    }
+}
+
 MatcP matc_real_mul(MatcP _a, float _b, MatcP _out)
 {
     int row, col;
@@ -1446,5 +1458,81 @@ void matf_set_rand(MatfP _data, int range)
     }
 }
 
+void matf_set_hanning(MatfP hanning_win)
+{
+    int i;
+    int fft_length = hanning_win->rows;
+    for (i = 0; i < fft_length; i++)
+    {
+        hanning_win->data[i][0] = 1. / 2. * ( 1 - cosf( M_TWOPI * ( i ) / ( fft_length - 1 ) ) );
+    }
+}
 
+void matf_set_hamming(MatfP hamming_win)
+{
+    int i;
+    int fft_length = hamming_win->rows;
+    for (i = 0; i < fft_length; i++)
+    {
+        hamming_win->data[i][0] = 0.54f - 0.46f * cosf( M_TWOPI * ( i ) / ( fft_length - 1 ) ) ;
+    }
+}
+
+void matf_set_rectwin(MatfP rect_win)
+{
+    int i;
+    int fft_length = rect_win->rows;
+    for (i = 0; i < fft_length; i++)
+    {
+        rect_win->data[i][0] = 1 ;
+    }
+}
+
+void matf_convert2com(MatfP _a, MatcP _out)
+{
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            _out->data[row][col].real = _a->data[row][col];
+        }
+    }
+}
+
+/* drop out the imag part */
+void matc_convert2real(MatcP _a, MatfP _out)
+{
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            _out->data[row][col] = _a->data[row][col].real;
+        }
+    }
+}
+
+MatcP matc_copy(MatcP _a, MatcP _out)
+{
+    int row;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows; row++)
+    {
+        memcpy(_out->data[row], _a->data[row], _a->cols * sizeof(c_num));
+    }
+    
+    return _out;
+}
 
