@@ -7,8 +7,8 @@
 
 #ifndef _IVA_H
 #define _IVA_H
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "matrix.h"
 #include "fft.h"

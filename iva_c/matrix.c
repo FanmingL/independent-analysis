@@ -5,7 +5,7 @@
 	> Created Time: 2018/05/09
  ************************************************************************/
 
-#include<stdio.h>
+#include <stdio.h>
 #include "matrix.h"
 //_out = _a + _b
 void c_add(c_num *_a, c_num *_b, c_num *_out)
@@ -1351,7 +1351,9 @@ int matrice_sys_init(int max_size_real, int max_size_complex)
         __MAX_SIZE_REAL__           = max_size_real;
         __MAX_SIZE_COMPLEX__        = max_size_complex;
         __MATRICE_INTI__            = 1;
+#if ENABLE_TIME
         srand((unsigned) time(NULL));
+#endif
         return 0;
     }
     return 1;

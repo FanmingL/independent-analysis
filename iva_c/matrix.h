@@ -7,22 +7,22 @@
 
 #ifndef _MATRIX_H
 #define _MATRIX_H
+#define ENABLE_ASSERT 1
+#define ENABLE_TIME 1
+
 #include "stdlib.h"
 #include "string.h"
 #include "time.h"
 #include <math.h>
 #define MY_MEM_ALLOCATE(VAR_PTR, NUM, TYPE)  {VAR_PTR = ((TYPE*)(malloc((NUM) * sizeof(TYPE))));}
-#define ENABLE_ASSERT 1
+#if ENABLE_ASSERT
 #include <assert.h>
-
-
-
 #define NEW_MAT_REAL(name, row, col)        \
                                             assert(__MATRICE_INTI__ == 1);\
                                             assert(__BASE_NUM_REAL__ < __MAX_SIZE_REAL__);\
                                             matf_resize(__REAL_BASE__ + __BASE_NUM_REAL__, row, col);\
                                             MatfP name =  __REAL_BASE__ + __BASE_NUM_REAL__;\
-                                            __BASE_NUM_REAL__++;\
+                                            __BASE_NUM_REAL__++;
 
 
 #define NEW_MAT_COMPLEX(name, row, col)    \
@@ -30,8 +30,20 @@
                                             assert(__BASE_NUM_COMPLEX__ < __MAX_SIZE_COMPLEX__);\
                                             matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
                                             MatcP name =  __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
-                                            __BASE_NUM_COMPLEX__++;\
+                                            __BASE_NUM_COMPLEX__++;
+#else
+#define NEW_MAT_REAL(name, row, col)        \
+                                            matf_resize(__REAL_BASE__ + __BASE_NUM_REAL__, row, col);\
+                                            MatfP name =  __REAL_BASE__ + __BASE_NUM_REAL__;\
+                                            __BASE_NUM_REAL__++;
 
+
+#define NEW_MAT_COMPLEX(name, row, col)    \
+                                            matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
+                                            MatcP name =  __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
+                                            __BASE_NUM_COMPLEX__++;
+
+#endif
 #ifndef M_TWOPI
 # define M_TWOPI       6.2831853071795862319959  /* 2*pi */
 #endif
