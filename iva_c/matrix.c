@@ -1138,7 +1138,7 @@ MatcP matc_inverse(MatcP _a, MatcP _out)
 #if ENABLE_ASSERT
     for(i = 0; i < N; i++)
     {
-        assert(U->data[i][i].real != 0 && U->data[i][i].imag != 0);
+        assert(U->data[i][i].real != 0 || U->data[i][i].imag != 0);
     }
 #endif
     /* here start caculate the inverse of L */
@@ -1339,7 +1339,7 @@ int __BASE_NUM_REAL__, __BASE_NUM_COMPLEX__, __MAX_SIZE_REAL__, __MAX_SIZE_COMPL
 Matf *__REAL_BASE__;
 Matc *__COMPLEX_BASE__;
 int __MATRICE_INTI__=0;
-
+int __MULTI_TEMP_COUNT__ = 0;
 int matrice_sys_init(int max_size_real, int max_size_complex)
 {
     if (__MATRICE_INTI__==0)
@@ -1537,4 +1537,69 @@ MatcP matc_copy(MatcP _a, MatcP _out)
     
     return _out;
 }
+
+MatcP matc_real_col_div(MatcP _a, MatfP _b, MatcP _out)
+{
+#if ENABLE_ASSERT
+    assert(_a->cols == _b->cols);
+#endif
+    int row, col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    for (row = 0; row < _a->rows ; row++)
+    {
+        for (col = 0; col < _a->cols; col++)
+        {
+            c_real_div(&(_a->data[row][col]), _b->data[0][col], &(_out->data[row][col]));
+        }
+    }
+    return _out;
+}
+
+//_out = sqrt(diag(transpose(conj(_a)) * _a))
+MatfP matc_metrix(MatcP _a, MatfP _out)
+{
+    int row, col;
+    float temp;
+    if (_out->rows != 1 || _out->cols != _a->cols)
+    {
+        matf_reallocate(_out, 1, 1, _a->cols, 1);
+    }
+    for (col = 0; col < _a->cols; col ++)
+    {
+        temp = 0;
+        for (row = 0; row < _a->rows; row++)
+        {
+            temp += _a->data[row][col].real * _a->data[row][col].real +
+                    _a->data[row][col].imag * _a->data[row][col].imag;
+        }
+        _out->data[0][col] = sqrtf(temp);
+    }
+    
+    return _out;
+}
+
+MatcP matc_select_diag(MatcP _a, MatcP _out)
+{
+    int col;
+    if (_out->rows != _a->rows || _out->cols != _a->cols)
+    {
+        matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
+    }
+    matc_set_zeros(_out);
+    for (col = 0; col < MY_MIN(_a->cols, _a->rows); col++)
+    {
+        _out->data[col][col] = _a->data[col][col];
+    }
+    return _out;
+}
+
+
+
+
+
+
+
 

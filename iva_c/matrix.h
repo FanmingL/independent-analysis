@@ -31,6 +31,25 @@
                                             matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
                                             MatcP name =  __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
                                             __BASE_NUM_COMPLEX__++;
+#define NEW_MULTI_MAT_COMPLEX(Ptr, row, col, size) \
+                                            assert(__MATRICE_INTI__ == 1);\
+                                            Ptr = __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
+                                            for (__MULTI_TEMP_COUNT__=0;__MULTI_TEMP_COUNT__<size;__MULTI_TEMP_COUNT__++)\
+                                            {\
+                                            assert(__BASE_NUM_COMPLEX__ < __MAX_SIZE_COMPLEX__);\
+                                            matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
+                                            __BASE_NUM_COMPLEX__++;\
+                                            }
+#define NEW_MULTI_MAT_REAL(Ptr, row, col, size) \
+                                            assert(__MATRICE_INTI__ == 1);\
+                                            Ptr = __REAL_BASE__ + __BASE_NUM_REAL__;\
+                                            for (__MULTI_TEMP_COUNT__=0;__MULTI_TEMP_COUNT__<size;__MULTI_TEMP_COUNT__++)\
+                                            {\
+                                            assert(__BASE_NUM_REAL__ < __MAX_SIZE_REAL__);\
+                                            matf_resize(__REAL_BASE__ + __BASE_NUM_REAL__, row, col);\
+                                            __BASE_NUM_REAL__++;\
+                                            }
+
 #else
 #define NEW_MAT_REAL(name, row, col)        \
                                             matf_resize(__REAL_BASE__ + __BASE_NUM_REAL__, row, col);\
@@ -42,7 +61,20 @@
                                             matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
                                             MatcP name =  __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
                                             __BASE_NUM_COMPLEX__++;
-
+#define NEW_MULTI_MAT_COMPLEX(Ptr, row, col, size) \
+                                            Ptr = __COMPLEX_BASE__ + __BASE_NUM_COMPLEX__;\
+                                            for (__MULTI_TEMP_COUNT__=0;__MULTI_TEMP_COUNT__<size;__MULTI_TEMP_COUNT__++)\
+                                            {\
+                                            matc_resize(__COMPLEX_BASE__ + __BASE_NUM_COMPLEX__, row, col);\
+                                            __BASE_NUM_COMPLEX__++;\
+                                            }
+#define NEW_MULTI_MAT_REAL(Ptr, row, col, size) \
+                                            Ptr = __REAL_BASE__ + __BASE_NUM_REAL__;\
+                                            for (__MULTI_TEMP_COUNT__=0;__MULTI_TEMP_COUNT__<size;__MULTI_TEMP_COUNT__++)\
+                                            {\
+                                            matf_resize(__REAL_BASE__ + __BASE_NUM_REAL__, row, col);\
+                                            __BASE_NUM_REAL__++;\
+                                            }
 #endif
 #ifndef M_TWOPI
 # define M_TWOPI       6.2831853071795862319959  /* 2*pi */
@@ -75,7 +107,7 @@ typedef struct
     c_num **data;
 }Matc;
 typedef Matc*const MatcP;
-extern int __BASE_NUM_REAL__, __BASE_NUM_COMPLEX__, __MAX_SIZE_REAL__, __MAX_SIZE_COMPLEX__, __MATRICE_INTI__;
+extern int __BASE_NUM_REAL__, __BASE_NUM_COMPLEX__, __MAX_SIZE_REAL__, __MAX_SIZE_COMPLEX__, __MATRICE_INTI__, __MULTI_TEMP_COUNT__ ;
 extern Matf *__REAL_BASE__;
 extern Matc *__COMPLEX_BASE__;
 int matrice_sys_init(int max_size_real, int max_size_complex);
@@ -156,4 +188,7 @@ void matf_convert2com(MatfP _a, MatcP _out);
 void matc_set_conj(MatcP _a);
 MatcP matc_copy(MatcP _a, MatcP _out);
 void matc_convert2real(MatcP _a, MatfP _out);
+MatcP matc_real_col_div(MatcP _a, MatfP _b, MatcP _out);
+MatfP matc_metrix(MatcP _a, MatfP _out);
+MatcP matc_select_diag(MatcP _a, MatcP _out);
 #endif
