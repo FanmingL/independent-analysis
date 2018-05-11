@@ -7,8 +7,8 @@
 
 #ifndef _MATRIX_H
 #define _MATRIX_H
-#define ENABLE_ASSERT 1
-#define ENABLE_TIME 1
+#define ENABLE_ASSERT 0
+#define ENABLE_TIME 0
 
 #include "stdlib.h"
 #include "string.h"
