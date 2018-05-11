@@ -708,7 +708,7 @@ void print_matc(MatcP _data, int _size)
         {
             for (col = 0; col < (_data + size)->cols; col++)
             {
-                c_print(&(_data->data[row][col]));
+                c_print(&((_data + size)->data[row][col]));
             }
             printf(";\n");
         }
@@ -1572,8 +1572,8 @@ MatfP matc_metrix(MatcP _a, MatfP _out)
         temp = 0;
         for (row = 0; row < _a->rows; row++)
         {
-            temp += _a->data[row][col].real * _a->data[row][col].real +
-                    _a->data[row][col].imag * _a->data[row][col].imag;
+            temp += (_a->data[row][col].real * _a->data[row][col].real +
+                    _a->data[row][col].imag * _a->data[row][col].imag);
         }
         _out->data[0][col] = sqrtf(temp);
     }
