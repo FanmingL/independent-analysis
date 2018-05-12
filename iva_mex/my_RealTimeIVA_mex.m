@@ -1,4 +1,4 @@
-iva_dir = './iva_mex';
+iva_dir = '.';
 if ~exist('real_time_iva','file')
     eval(['mex -I',iva_dir,' ',iva_dir,'/real_time_iva.c ',iva_dir,'/fft.c ',iva_dir,'/iva.c ',iva_dir,'/matrix.c ;']);
 end

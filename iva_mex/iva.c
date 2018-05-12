@@ -83,7 +83,7 @@ void iva_process(iva_tP iva_it)
     fft_real(iva_it->data_windowed, iva_it->data_fft);
     
     /* imlement iva algorithm */
-    matc_estimate(iva_it, iva_it->data_fft, iva_it->unmix_matrix, iva_it->data_estimate, iva_it->effective_length, iva_it->source_num);
+    iva_estimate(iva_it, iva_it->data_fft, iva_it->unmix_matrix, iva_it->data_estimate, iva_it->effective_length, iva_it->source_num);
 
     iva_norm_matrix(iva_it, iva_it->unmix_matrix, iva_it->norm_matrix, iva_it->effective_length, iva_it->source_num);
     
@@ -91,11 +91,11 @@ void iva_process(iva_tP iva_it)
 
     matc_real_col_div(iva_it->data_estimate, temp, iva_it->Phi);
 
-    matc_unmix_matrix_update(iva_it, iva_it->unmix_matrix, iva_it->ksi, iva_it->Phi, iva_it->data_estimate, iva_it->effective_length, iva_it->source_num, iva_it->eta);
+    iva_unmix_matrix_update(iva_it, iva_it->unmix_matrix, iva_it->ksi, iva_it->Phi, iva_it->data_estimate, iva_it->effective_length, iva_it->source_num, iva_it->eta);
     
-    matc_ksi_update(iva_it->ksi, iva_it->data_fft, iva_it->effective_length, iva_it->source_num, iva_it->beta);
+    iva_ksi_update(iva_it->ksi, iva_it->data_fft, iva_it->effective_length, iva_it->source_num, iva_it->beta);
     
-    est_update(iva_it, iva_it->data_estimate, iva_it->norm_matrix, iva_it->effective_length, iva_it->source_num);
+    iva_est_update(iva_it, iva_it->data_estimate, iva_it->norm_matrix, iva_it->effective_length, iva_it->source_num);
     
     /* reconstruct signal */
     ifft_real(iva_it->data_estimate, iva_it->data_reconstruct);
@@ -143,7 +143,7 @@ void iva_frame_split(int shift_size, int fft_length, int source_num, float **dat
     }
 }
 
-void matc_estimate(iva_tP iva_it, MatcP signal_obs, MatcP unmix, MatcP out, int fft_length, int source_num)
+void iva_estimate(iva_tP iva_it, MatcP signal_obs, MatcP unmix, MatcP out, int fft_length, int source_num)
 {
     int i;
 #if 1
@@ -180,7 +180,7 @@ void matc_estimate(iva_tP iva_it, MatcP signal_obs, MatcP unmix, MatcP out, int 
     
 }
 
-void matc_R_matrix(MatcP esti, MatcP Phi, MatcP R, int fft_length, int source_num)
+void iva_R_matrix(MatcP esti, MatcP Phi, MatcP R, int fft_length, int source_num)
 {
     int col, row, i;
     for (i = 0; i <fft_length; i++)
@@ -198,7 +198,7 @@ void matc_R_matrix(MatcP esti, MatcP Phi, MatcP R, int fft_length, int source_nu
     }
 }
 
-void matc_unmix_matrix_update(iva_tP iva_it, MatcP G, MatfP Ksi, MatcP Phi, MatcP esti, int fft_length, int source_num, float eta)
+void iva_unmix_matrix_update(iva_tP iva_it, MatcP G, MatfP Ksi, MatcP Phi, MatcP esti, int fft_length, int source_num, float eta)
 {
     int i, col, row;
     for (i = 0; i < fft_length; i++)
@@ -223,7 +223,7 @@ void matc_unmix_matrix_update(iva_tP iva_it, MatcP G, MatfP Ksi, MatcP Phi, Matc
 
 }
 
-void matc_ksi_update(MatfP Ksi, MatcP fft_data, int fft_length, int source_num, float beta)
+void iva_ksi_update(MatfP Ksi, MatcP fft_data, int fft_length, int source_num, float beta)
 {
     int i = 0, col = 0;
     float temp = 0;
@@ -239,7 +239,7 @@ void matc_ksi_update(MatfP Ksi, MatcP fft_data, int fft_length, int source_num, 
     }
 }
 
-void est_update(iva_tP iva_it, MatcP est, MatcP norm, int fft_length, int source_num)
+void iva_est_update(iva_tP iva_it, MatcP est, MatcP norm, int fft_length, int source_num)
 {
     matc_cwise_mul(est, norm, iva_it->temp_est);
     matc_copy(iva_it->temp_est, est);
