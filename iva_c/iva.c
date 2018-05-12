@@ -23,7 +23,6 @@ void iva_init(iva_tP iva_it, int fft_length, int source_num, int shift_size, flo
     iva_it->effective_length = fft_length / 2 + 1;
     iva_it->data_buffer_count = 0;
     NEW_MULTI_MAT_COMPLEX(iva_it->unmix_matrix, source_num, source_num, iva_it->effective_length);
-    NEW_MULTI_MAT_COMPLEX(iva_it->R_matrix, source_num, source_num, iva_it->effective_length);
     NEW_MULTI_MAT_COMPLEX(iva_it->norm_matrix, iva_it->effective_length, source_num, 1);
     NEW_MULTI_MAT_REAL(iva_it->data_input, fft_length, source_num, 1);
     NEW_MULTI_MAT_REAL(iva_it->data_sperated, shift_size, source_num, 1);

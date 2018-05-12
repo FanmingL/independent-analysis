@@ -10,8 +10,8 @@
 #include "iva.h"
 #include "matrix.h"
 #include "fft.h"
-#define MAX_REAL_BUFFER     2000
-#define MAX_COMPLEX_BUFFER  2000
+#define MAX_REAL_BUFFER     1100
+#define MAX_COMPLEX_BUFFER  1100
 
 //arg0 rows of the screen
 //arg1 cols of the screen

@@ -31,7 +31,6 @@ typedef struct
     Matf *window;
     Matc *unmix_matrix;
     Matc *norm_matrix;
-    Matc *R_matrix;
     Matc *Phi;
     Matc *data_fft;
     Matf *data_buffer;

@@ -9,8 +9,8 @@
 #include "iva.h"
 #include "time.h"
 #define LEN 5
-#define MAX_SIZE_REAL 1000
-#define MAX_SIZE_COMPLEX 1000
+#define MAX_SIZE_REAL 1100
+#define MAX_SIZE_COMPLEX 1100
 #ifndef SOURCE_NUM
 #define SOURCE_NUM 2                //default source number is 2
 #endif
