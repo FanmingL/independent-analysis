@@ -6,8 +6,21 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include "fft.h"
-#include "matrix.h"
+#include <fft.h>
+#include <matrix.h>
+
+Matc* signal_temp1, *signal_temp2, *signal_temp3;
+Matc* fft_temp1, *fft_temp2, *fft_temp3;
+
+
+void fft_init(int fft_length, int source_num)
+{
+	NEW_MULTI_MAT_COMPLEX(signal_temp1, fft_length,  source_num, 1);
+	NEW_MULTI_MAT_COMPLEX(signal_temp2, fft_length,  source_num, 1);
+	NEW_MULTI_MAT_COMPLEX(signal_temp3, fft_length,  source_num, 1);
+	NEW_MULTI_MAT_COMPLEX(fft_temp2, fft_length,  source_num, 1);
+	NEW_MULTI_MAT_COMPLEX(fft_temp3, fft_length,  source_num, 1);
+}
 
 /* for both real and complex signal */
 MatcP fft(MatcP signal, MatcP fft_signal)
@@ -21,11 +34,13 @@ MatcP fft(MatcP signal, MatcP fft_signal)
 #if ENABLE_ASSERT
     assert(!NOT2POW(fft_length));
 #endif
-    for(;!(t&1);t>>=1) ex++;
+    for(;(!(t&1));t>>=1) ex++;
+#if ENABLE_ASSERT
     if (fft_signal->rows != signal->rows || fft_signal->cols != signal->cols)
     {
         matc_reallocate(fft_signal, 1, signal->rows, fft_signal->cols, 1);
     }
+#endif
     for (col = 0; col < cols; col++)
     {
         for(i=0;i<fft_length;i++){
@@ -74,13 +89,11 @@ MatcP fft(MatcP signal, MatcP fft_signal)
 /* for both real and complex signal */
 MatcP ifft(MatcP fft_signal, MatcP signal)
 {
-    MatcP temp_ = matc_zeros(fft_signal->rows, fft_signal->cols);
-    matc_copy(fft_signal, temp_);
-    matc_set_conj(temp_);
-    fft(temp_, signal);
+    matc_copy(fft_signal, signal_temp1);
+    matc_set_conj(signal_temp1);
+    fft(signal_temp1, signal);
     matc_set_conj(signal);
     matc_real_mul(signal, 1./fft_signal->rows, signal);
-    free_matc(temp_, 1);
     return signal;
 }
 
@@ -88,10 +101,12 @@ MatcP ifft(MatcP fft_signal, MatcP signal)
 /* only for real signal, assuming that fft_length is even number  */
 MatcP fft_shift(MatcP fft_signal_full, MatcP fft_signal_half)
 {
+#if ENABLE_ASSERT
     if (fft_signal_full->rows / 2 + 1 != fft_signal_half->rows || fft_signal_full->cols != fft_signal_half->cols)
     {
         matc_reallocate(fft_signal_half, 1, fft_signal_full->rows / 2 + 1, fft_signal_full->cols, 1);
     }
+#endif
     int row;
     for (row = 0; row < fft_signal_full->rows / 2 + 1; row++)
     {
@@ -103,10 +118,12 @@ MatcP fft_shift(MatcP fft_signal_full, MatcP fft_signal_half)
 /* only for real signal */
 MatcP fft_ishift(MatcP fft_signal_half, MatcP fft_signal_full)
 {
+#if ENABLE_ASSERT
     if (fft_signal_full->rows / 2 + 1 != fft_signal_half->rows || fft_signal_full->cols != fft_signal_half->cols)
     {
         matc_reallocate(fft_signal_full, 1, (fft_signal_half->rows - 1) * 2 , fft_signal_half->cols, 1);
     }
+#endif
     int row, col;
     for (row = 0; row < fft_signal_full->rows / 2 + 1; row++)
     {
@@ -125,26 +142,18 @@ MatcP fft_ishift(MatcP fft_signal_half, MatcP fft_signal_full)
 /* only for real signal, return length is fft_length/2 + 1 */
 MatcP fft_real(MatfP signal, MatcP fft_signal)
 {
-    MatcP fft_temp = matc_zeros(signal->rows, signal->cols);
-    MatcP signal_temp = matc_zeros(signal->rows, signal->cols);
-    matf_convert2com(signal, signal_temp);
-    fft(signal_temp, fft_temp);
-    fft_shift(fft_temp, fft_signal);
-    free_matc(fft_temp, 1);
-    free_matc(signal_temp, 1);
+    matf_convert2com(signal, signal_temp2);
+    fft(signal_temp2, fft_temp2);
+    fft_shift(fft_temp2, fft_signal);
     return fft_signal;
 }
 
 /* only for real signal, return length is fft_length */
 MatfP ifft_real(MatcP fft_signal, MatfP signal)
 {
-    MatcP fft_temp = matc_zeros((fft_signal->rows - 1) * 2, signal->cols);
-    MatcP signal_temp = matc_zeros((fft_signal->rows - 1) * 2, signal->cols);
-    fft_ishift(fft_signal, fft_temp);
-    ifft(fft_temp, signal_temp);
-    matc_convert2real(signal_temp, signal);
-    free_matc(fft_temp, 1);
-    free_matc(signal_temp, 1);
+    fft_ishift(fft_signal, fft_temp3);
+    ifft(fft_temp3, signal_temp3);
+    matc_convert2real(signal_temp3, signal);
     return signal;
 }
 
