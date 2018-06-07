@@ -10,8 +10,8 @@
 #include "iva.h"
 #include "matrix.h"
 #include "fft.h"
-#define MAX_REAL_BUFFER     1100
-#define MAX_COMPLEX_BUFFER  1100
+#define MAX_REAL_BUFFER     2000
+#define MAX_COMPLEX_BUFFER  2000
 
 //arg0 rows of the screen
 //arg1 cols of the screen
@@ -70,9 +70,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])//in
     {
         eta = 0.1f;
     }
-    
-    matrice_sys_init(MAX_REAL_BUFFER, MAX_COMPLEX_BUFFER);
+    matrice_sys_init(MAX_REAL_BUFFER, MAX_COMPLEX_BUFFER, cols);
     iva_init(&iva_instance, fft_length, cols, shift_size, beta, eta);
+    fft_init(fft_length, cols);
+
     data_in = malloc(cols * sizeof(float));
     ii = 0;
     for (i = 0; i < rows; i++)

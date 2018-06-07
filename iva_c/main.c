@@ -25,10 +25,10 @@ int main(int argc, char** argv)
     float **out_signal;
     clock_t start,end, period = 0;
     matrice_sys_init(MAX_SIZE_REAL, MAX_SIZE_COMPLEX);
-    iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, FFT_LEN / 4, 0.5f, 0.11f);
+    iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, FFT_LEN / 4, 0.5f, 0.003f);
     
     
-    fp=fopen("/Users/erdou/Documents/GitHub/independent-analysis/iva_c/data.prototxt","r");
+    fp=fopen("/Users/erdou/Documents/MacToWin/Share/audio/data.prototxt","r");
     fp2=fopen("/Users/erdou/Documents/GitHub/independent-analysis/iva_c/out.prototxt","w");
     if ( fp )
     {
