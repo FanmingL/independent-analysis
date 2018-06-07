@@ -246,19 +246,49 @@ void iva_est_update(iva_tP iva_it, MatcP est, MatcP norm, int fft_length, int so
     matc_copy(iva_it->temp_est, est);
 }
 
+/*
+ void c_div(c_num *_a, c_num *_b, c_num *out)
+ {
+ float sum_temp = _b->real * _b->real + _b->imag * _b->imag;
+ out->real = (_a->real * _b->real + _a->imag * _b->imag ) / sum_temp;
+ out->imag = (_a->imag * _b->real - _a->real * _b->imag ) / sum_temp;
+ }
+ 
+ */
+#define VAL_DIV(x,y,out,abs_y) out.real = (x.real * y.real + x.imag * y.imag ) / abs_y;\
+out.imag = (x.imag * y.real - x.real * y.imag ) / abs_y;
 void iva_norm_matrix(iva_tP iva_it, MatcP unmix, MatcP norm, int fft_length, int source_num)
 {
     int i = 0, t = 0;
+    c_num det_val ;
+    float abs_y = 0;
     for (i = 0; i < fft_length; i++)
     {
+#if 1
         matc_inverse(unmix + i, iva_it->temp_norm);
         for (t = 0; t < source_num; t++)
         {
             norm->data[i][t] = iva_it->temp_norm->data[t][t];
         }
+#else
+        /*x_inverse = [x(2,2), - x(1,2);-x(2,1), x(1,1)] / (x(1,1) * x(2,2) -x(1,2) * x(2,1));*/
+        det_val.real = ((*(unmix + i)).data)[0][0].real * ((*(unmix + i)).data)[1][1].real-
+        ((*(unmix + i)).data)[0][0].imag * ((*(unmix + i)).data)[1][1].imag-(
+                                                                             ((*(unmix + i)).data)[0][1].real * ((*(unmix + i)).data)[1][0].real-
+                                                                             ((*(unmix + i)).data)[0][1].imag * ((*(unmix + i)).data)[1][0].imag
+                                                                             );
+        det_val.imag = ((*(unmix + i)).data)[0][0].imag * ((*(unmix + i)).data)[1][1].real+
+        ((*(unmix + i)).data)[0][0].real * ((*(unmix + i)).data)[1][1].imag-(
+                                                                             ((*(unmix + i)).data)[0][1].imag * ((*(unmix + i)).data)[1][0].real+
+                                                                             ((*(unmix + i)).data)[0][1].real * ((*(unmix + i)).data)[1][0].imag
+                                                                             );
+        abs_y = det_val.real*det_val.real+det_val.imag*det_val.imag;
+        VAL_DIV((((*(unmix + i)).data)[1][1]),det_val,(norm->data[i][0]),abs_y);
+        VAL_DIV((((*(unmix + i)).data)[0][0]),det_val,(norm->data[i][1]),abs_y);
+        
+#endif
     }
 }
-
 
 
 
