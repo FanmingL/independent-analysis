@@ -11,15 +11,24 @@
 
 Matc* signal_temp1, *signal_temp2, *signal_temp3;
 Matc* fft_temp1, *fft_temp2, *fft_temp3;
-
-
+float *cos_buffer,*sin_buffer;
+unsigned int ex = 0;
 void fft_init(int fft_length, int source_num)
 {
+    unsigned int t = fft_length;
 	NEW_MULTI_MAT_COMPLEX(signal_temp1, fft_length,  source_num, 1);
 	NEW_MULTI_MAT_COMPLEX(signal_temp2, fft_length,  source_num, 1);
 	NEW_MULTI_MAT_COMPLEX(signal_temp3, fft_length,  source_num, 1);
 	NEW_MULTI_MAT_COMPLEX(fft_temp2, fft_length,  source_num, 1);
 	NEW_MULTI_MAT_COMPLEX(fft_temp3, fft_length,  source_num, 1);
+    cos_buffer = (float *)malloc(fft_length * sizeof(float));
+    sin_buffer = (float *)malloc(fft_length * sizeof(float));
+    for(;(!(t&1));t>>=1) ex++;
+    for (t = 0; t < fft_length; t++)
+	{
+		cos_buffer[t] = cosf(-M_PI*t/fft_length);
+		sin_buffer[t] = sinf(-M_PI*t/fft_length);
+	}
 }
 
 /* for both real and complex signal */
@@ -29,12 +38,12 @@ MatcP fft(MatcP signal, MatcP fft_signal)
     unsigned int ex=0,t=fft_length;
     unsigned int i,j,k,col;
     unsigned int cols = signal->cols;
-    
+    unsigned int index;
     float tr,ti,rr,ri,yr,yi;
 #if ENABLE_ASSERT
     assert(!NOT2POW(fft_length));
 #endif
-    for(;(!(t&1));t>>=1) ex++;
+   // for(;(!(t&1));t>>=1) ex++;
 #if ENABLE_ASSERT
     if (fft_signal->rows != signal->rows || fft_signal->cols != signal->cols)
     {
@@ -61,9 +70,9 @@ MatcP fft(MatcP signal, MatcP fft_signal)
             t=1<<i;
             for(j=0;j<fft_length;j+=t<<1){
                 for(k=0;k<t;k++){
-                    ti=-M_PI*k/t;
-                    rr=cosf(ti);
-                    ri=sinf(ti);
+                    index = k * fft_length / t;
+                	rr = cos_buffer[index];
+                	ri = sin_buffer[index];
                     
                     tr=fft_signal->data[j+k+t][col].real;
                     ti=fft_signal->data[j+k+t][col].imag;
