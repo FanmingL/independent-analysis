@@ -35,7 +35,7 @@ void fft_init(int fft_length, int source_num)
 MatcP fft(MatcP signal, MatcP fft_signal)
 {
     unsigned int fft_length = signal->rows;
-    unsigned int ex=0,t=fft_length;
+    unsigned int t=fft_length;
     unsigned int i,j,k,col;
     unsigned int cols = signal->cols;
     unsigned int index;
