@@ -1,0 +1,31 @@
+; Code Composer Project File, Version 2.0 (do not modify or remove this line)
+
+[Project Settings]
+ProjectDir="D:\6713\01.MP3Encoder\"
+ProjectType=Executable
+CPUFamily=TMS320C67XX
+Tool="Compiler"
+Tool="CustomBuilder"
+Tool="DspBiosBuilder"
+Tool="Linker"
+Config="Release"
+
+[Source Files]
+Source="MP3Encoder.cdb"
+Source="src\MP3Encoder.c"
+Source="MP3Encoder.cmd"
+
+[Generated Files]
+Source="MP3Encodercfg.cmd"
+Source="MP3Encodercfg.s62"
+Source="MP3Encodercfg_c.c"
+
+["Compiler" Settings: "Release"]
+Options=-g -fr"$(Proj_dir)\bin" -i"D:\6713\01.MP3Encoder\include" -d"CHIP_6713" -mv6700
+
+["DspBiosBuilder" Settings: "Release"]
+Options=-v6x
+
+["Linker" Settings: "Release"]
+Options=-c -heap0x400 -m".\bin\MP3Encoder.map" -o".\bin\MP3Encoder.out" -stack0x400
+

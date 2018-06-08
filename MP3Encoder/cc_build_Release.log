@@ -1,0 +1,14 @@
+--------------------------  MP3Encoder.pjt - Release  --------------------------
+"d:\ticcs6000\plugins\bios\gconfgen" MP3Encoder.cdb
+
+"d:\ticcs6000\c6000\cgtools\bin\cl6x" -g -fr"E:/04.Temp/01.MP3Encoder/bin" -i"E:/04.Temp/01.MP3Encoder/include" -d"CHIP_6713" -mv6700 -@"../Release.lkf" "MP3Encoder.c"
+
+"d:\ticcs6000\c6000\cgtools\bin\cl6x" -g -fr"E:/04.Temp/01.MP3Encoder/bin" -i"E:/04.Temp/01.MP3Encoder/include" -d"CHIP_6713" -mv6700 -@"Release.lkf" "MP3Encodercfg.s62"
+
+"d:\ticcs6000\c6000\cgtools\bin\cl6x" -g -fr"E:/04.Temp/01.MP3Encoder/bin" -i"E:/04.Temp/01.MP3Encoder/include" -d"CHIP_6713" -mv6700 -@"Release.lkf" "MP3Encodercfg_c.c"
+
+"d:\ticcs6000\c6000\cgtools\bin\cl6x" -@"Release.lkf"
+<Linking>
+
+Build Complete,
+  0 Errors, 0 Warnings, 0 Remarks.

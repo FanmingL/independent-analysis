@@ -1,0 +1,17 @@
+---------------------------  MP3Encoder.pjt - Debug  ---------------------------
+[MP3Encoder.cdb] "E:\CCStudio\plugins\bios\gconfgen" MP3Encoder.cdb
+
+[MP3Encoder.c] "E:\CCStudio\C6000\cgtools\bin\cl6x" -g -fr"F:/MP3/Projects/MP3Encoder/Debug" -i"F:/MP3/Projects/MP3Encoder/include" -d"CHIP_6713" -mv6700 -@"../Debug.lkf" "MP3Encoder.c"
+
+[MP3Encodercfg.s62] "E:\CCStudio\C6000\cgtools\bin\cl6x" -g -fr"F:/MP3/Projects/MP3Encoder/Debug" -i"F:/MP3/Projects/MP3Encoder/include" -d"CHIP_6713" -mv6700 -@"Debug.lkf" "MP3Encodercfg.s62"
+
+[MP3Encodercfg_c.c] "E:\CCStudio\C6000\cgtools\bin\cl6x" -g -fr"F:/MP3/Projects/MP3Encoder/Debug" -i"F:/MP3/Projects/MP3Encoder/include" -d"CHIP_6713" -mv6700 -@"Debug.lkf" "MP3Encodercfg_c.c"
+
+[Linking...] "E:\CCStudio\C6000\cgtools\bin\cl6x" -@"Debug.lkf"
+<Linking>
+>> F:\MP3\Projects\MP3Encoder\MP3Encodercfg.cmd, line 69: warning: 
+               symbol _tskAudio from file
+               F:\MP3\Projects\MP3Encoder\Debug\MP3Encoder.obj being redefined
+
+Build Complete,
+  0 Errors, 1 Warnings, 0 Remarks.

@@ -1,0 +1,2 @@
+# Add the following to the Tconf command line
+-Dconfig.importPath="C:/ti/bios_5_42_01_09/packages"

@@ -1,0 +1,276 @@
+
+/* loading the generic platform */
+var params = {};
+params.clockRate = 225;
+params.deviceName = "6713";
+params.catalogName = "ti.catalog.c6000";
+params.regs = {};
+params.regs.l2Mode = "SRAM";
+utils.loadPlatform("ti.platforms.generic", params);
+
+
+/* enabling DSP/BIOS components */
+bios.GBL.ENABLEINST = true;
+bios.MEM.NOMEMORYHEAPS = false;
+bios.RTDX.ENABLERTDX = true;
+bios.HST.HOSTLINKTYPE = "RTDX";
+bios.TSK.ENABLETSK = true;
+bios.GBL.ENABLEALLTRC = true;
+
+bios.GBL.ENDIANMODE = "little";
+
+bios.GBL.C621XCONFIGUREL2 = false;
+
+/* applying user changes */
+bios.SDRAM = bios.MEM.create("SDRAM");
+
+bios.SDRAM.base = 0x80000000;
+
+bios.SDRAM.len = 0x1000000;
+
+bios.SDRAM.enableHeapLabel = 1;
+
+bios.SDRAM.heapLabel = prog.extern("extHeap");
+
+bios.SDRAM.space = "code/data";
+
+bios.tskAudio = bios.TSK.create("tskAudio");
+
+bios.trace = bios.LOG.create("trace");
+
+bios.udevCodec = bios.UDEV.create("udevCodec");
+
+bios.IRAM.len = 0x40000;
+
+bios.IRAM.createHeap = 1;
+
+bios.RTA_fromHost.bufSeg = prog.get("SDRAM");
+
+bios.RTA_toHost.bufSeg = prog.get("SDRAM");
+
+bios.MEM.ARGSSEG = prog.get("SDRAM");
+
+bios.MEM.BIOSSEG = prog.get("SDRAM");
+
+bios.MEM.STACKSEG = prog.get("SDRAM");
+
+bios.MEM.SYSINITSEG = prog.get("SDRAM");
+
+bios.MEM.GBLINITSEG = prog.get("SDRAM");
+
+bios.MEM.TRCDATASEG = prog.get("SDRAM");
+
+bios.MEM.SYSDATASEG = prog.get("SDRAM");
+
+bios.MEM.OBJSEG = prog.get("SDRAM");
+
+bios.MEM.BIOSOBJSEG = prog.get("SDRAM");
+
+bios.MEM.MALLOCSEG = prog.get("SDRAM");
+
+bios.MEM.TEXTSEG = prog.get("SDRAM");
+
+bios.MEM.SWITCHSEG = prog.get("SDRAM");
+
+bios.MEM.BSSSEG = prog.get("SDRAM");
+
+bios.MEM.FARSEG = prog.get("SDRAM");
+
+bios.MEM.CINITSEG = prog.get("SDRAM");
+
+bios.MEM.PINITSEG = prog.get("SDRAM");
+
+bios.MEM.CONSTSEG = prog.get("SDRAM");
+
+bios.MEM.DATASEG = prog.get("SDRAM");
+
+bios.MEM.CIOSEG = prog.get("SDRAM");
+
+bios.MEM.SYSMEMSEG = prog.get("SDRAM");
+
+bios.MEM.HWISEG = prog.get("SDRAM");
+
+bios.MEM.HWIVECSEG = prog.get("SDRAM");
+
+bios.MEM.RTDXTEXTSEG = prog.get("SDRAM");
+
+bios.GBL.CALLUSERINITFXN = 1;
+
+bios.GBL.BOARDNAME = "c6713";
+
+bios.BUF.OBJMEMSEG = prog.get("SDRAM");
+
+bios.HST.OBJMEMSEG = prog.get("SDRAM");
+
+bios.TSK.STACKSEG = prog.get("IRAM");
+
+bios.tskAudio.comment = "task Audio";
+
+bios.tskAudio.fxn = prog.extern("tsk_Audio");
+
+bios.tskAudio.stackSize = 0x1000;
+
+bios.tskAudio.stackMemSeg = prog.get("SDRAM");
+
+bios.tskAudio.priority = 0x3;
+
+bios.LNK_dataPump.order = 1;
+
+bios.RTA_dispatcher.order = 0x2;
+
+bios.IDL_cpuLoad.order = 0x3;
+
+bios.trace.bufSeg = prog.get("IRAM");
+
+bios.PIP.OBJMEMSEG = prog.get("SDRAM");
+
+bios.SEM.OBJMEMSEG = prog.get("SDRAM");
+
+bios.MBX.OBJMEMSEG = prog.get("SDRAM");
+
+bios.QUE.OBJMEMSEG = prog.get("SDRAM");
+
+bios.LCK.OBJMEMSEG = prog.get("SDRAM");
+
+bios.SIO.OBJMEMSEG = prog.get("SDRAM");
+
+bios.STS.OBJMEMSEG = prog.get("SDRAM");
+
+bios.SYS.TRACESEG = prog.get("SDRAM");
+
+bios.GIO.ENABLEGIO = 1;
+
+bios.udevCodec.initFxn = prog.extern("DEC6713_EDMA_AIC23_init");
+
+bios.udevCodec.fxnTable = prog.extern("DEC6713_EDMA_AIC23_FXNS");
+
+bios.udevCodec.fxnTableType = "IOM_Fxns";
+
+bios.udevCodec.deviceId = 1;
+
+bios.DIO.OBJMEMSEG = prog.get("SDRAM");
+
+bios.dio_codec = bios.DIO.create("dio_codec");
+
+bios.dio_codec.comment = "DIO Adapter for IOM Codec driver";
+
+bios.dio_codec.deviceName = prog.get("udevCodec");
+
+bios.GBL.USERINITFXN = prog.extern("DEC6713_init");
+
+bios.PRD_clock.order = 1;
+
+bios.RTDX.RTDXDATASEG = prog.get("SDRAM");
+
+bios.MEM.instance("IRAM").heapSize = 0x00018000;
+bios.MEM.instance("SDRAM").heapSize = 0x00038000;
+bios.MEM.STACKSIZE = 0x2000;
+bios.MEM.TEXTSEG = prog.get("IRAM");
+bios.MEM.MALLOCSEG = prog.get("SDRAM");
+bios.MEM.TEXTSEG = prog.get("SDRAM");
+bios.GBL.C621XCONFIGUREL2 = 1;
+bios.MEM.instance("IRAM").heapSize = 0x00013000;
+bios.MEM.instance("IRAM").len = 0x00030000;
+bios.MEM.TEXTSEG = prog.get("IRAM");
+bios.GBL.C621XCONFIGUREL2 = 0;
+bios.MEM.instance("IRAM").heapSize = 0x00014000;
+bios.MEM.instance("IRAM").heapSize = 0x00015000;
+bios.MEM.MALLOCSEG = prog.get("IRAM");
+bios.MEM.BSSSEG = prog.get("IRAM");
+bios.MEM.STACKSEG = prog.get("IRAM");
+bios.MEM.FARSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00014000;
+bios.GBL.CLKOUT = 300.0000;
+bios.GBL.CLKIN = 25000;
+bios.GBL.CLKIN = 20000;
+bios.GBL.CLKOUT = 225.0000;
+bios.GBL.SPECIFYRTSLIB = 0;
+bios.MEM.instance("IRAM").heapSize = 0x00013000;
+bios.MEM.instance("IRAM").heapSize = 0x00011000;
+bios.GBL.CLKOUT = 300.0000;
+bios.MEM.instance("IRAM").heapSize = 0x00012000;
+bios.MEM.STACKSIZE = 0x0500;
+bios.MEM.instance("IRAM").heapSize = 0x00013500;
+bios.MEM.instance("IRAM").heapSize = 0x00014500;
+bios.MEM.instance("IRAM").heapSize = 0x00013500;
+bios.GBL.C621XCONFIGUREL2 = 1;
+bios.BUF.OBJMEMSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").len = 0x00040000;
+bios.MEM.instance("IRAM").heapSize = 0x00019000;
+bios.MEM.BIOSSEG = prog.get("IRAM");
+bios.MEM.SYSINITSEG = prog.get("IRAM");
+bios.MEM.HWISEG = prog.get("IRAM");
+bios.MEM.HWIVECSEG = prog.get("IRAM");
+bios.MEM.RTDXTEXTSEG = prog.get("IRAM");
+bios.MEM.BIOSSEG = prog.get("SDRAM");
+bios.MEM.SYSINITSEG = prog.get("SDRAM");
+bios.MEM.HWISEG = prog.get("SDRAM");
+bios.MEM.HWIVECSEG = prog.get("SDRAM");
+bios.MEM.RTDXTEXTSEG = prog.get("SDRAM");
+bios.MEM.ARGSSEG = prog.get("IRAM");
+bios.MEM.CINITSEG = prog.get("IRAM");
+bios.MEM.DATASEG = prog.get("IRAM");
+bios.MEM.BIOSOBJSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00013000;
+bios.MEM.instance("IRAM").len = 0x00030000;
+bios.MEM.instance("IRAM").heapSize = 0x00011000;
+bios.MEM.instance("IRAM").heapSize = 0x00012000;
+bios.MEM.create("MEM0");
+bios.MEM.instance("MEM0").base = 0x00030000;
+bios.MEM.instance("MEM0").len = 0x00010000;
+bios.MEM.instance("MEM0").space = "code/data";
+bios.MEM.SWITCHSEG = prog.get("IRAM");
+bios.MEM.PINITSEG = prog.get("IRAM");
+bios.MEM.CONSTSEG = prog.get("IRAM");
+bios.MEM.CIOSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00011800;
+bios.MEM.HWIVECSEG = prog.get("IRAM");
+bios.MEM.HWISEG = prog.get("IRAM");
+bios.MEM.SYSINITSEG = prog.get("IRAM");
+bios.MEM.RTDXTEXTSEG = prog.get("IRAM");
+bios.MEM.BIOSSEG = prog.get("IRAM");
+bios.MEM.SYSINITSEG = prog.get("SDRAM");
+bios.MEM.HWISEG = prog.get("SDRAM");
+bios.MEM.HWIVECSEG = prog.get("SDRAM");
+bios.MEM.RTDXTEXTSEG = prog.get("SDRAM");
+bios.MEM.ARGSSEG = prog.get("IRAM");
+bios.MEM.BIOSSEG = prog.get("SDRAM");
+bios.MEM.BIOSSEG = prog.get("IRAM");
+bios.MEM.SYSINITSEG = prog.get("IRAM");
+bios.TSK.instance("TSK_idle").stackMemSeg = prog.get("SDRAM");
+bios.TSK.instance("tskAudio").stackMemSeg = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00011000;
+bios.MEM.instance("IRAM").heapSize = 0x00009000;
+bios.MEM.instance("IRAM").heapSize = 0x00011000;
+bios.MEM.DATASEG = prog.get("SDRAM");
+bios.MEM.CIOSEG = prog.get("SDRAM");
+bios.MEM.CONSTSEG = prog.get("SDRAM");
+bios.MEM.PINITSEG = prog.get("SDRAM");
+bios.MEM.instance("IRAM").len = 0x00040000;
+bios.MEM.instance("MEM0").destroy();
+bios.MEM.instance("IRAM").heapSize = 0x00014000;
+bios.MEM.PINITSEG = prog.get("IRAM");
+bios.MEM.CONSTSEG = prog.get("IRAM");
+bios.MEM.DATASEG = prog.get("IRAM");
+bios.MEM.CIOSEG = prog.get("IRAM");
+bios.MEM.HWISEG = prog.get("IRAM");
+bios.MEM.HWIVECSEG = prog.get("IRAM");
+bios.MEM.RTDXTEXTSEG = prog.get("IRAM");
+bios.MEM.SYSDATASEG = prog.get("IRAM");
+bios.MEM.GBLINITSEG = prog.get("IRAM");
+bios.MEM.TRCDATASEG = prog.get("IRAM");
+bios.MEM.OBJSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00015000;
+bios.MEM.STACKSIZE = 0x0700;
+bios.SYS.TRACESEG = prog.get("IRAM");
+bios.TSK.instance("TSK_idle").stackMemSeg = prog.get("IRAM");
+bios.SIO.OBJMEMSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00018000;
+bios.MEM.instance("IRAM").heapSize = 0x00020000;
+bios.MEM.STACKSIZE = 0x0900;
+bios.MEM.instance("IRAM").heapSize = 0x00015000;
+// !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
+
+if (config.hasReportedError == false) {
+    prog.gen();
+}

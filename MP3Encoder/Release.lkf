@@ -1,0 +1,6 @@
+-z -c -heap0x400 -m"./bin/MP3Encoder.map" -o"./bin/MP3Encoder.out" -stack0x400 -i"d:/ticcs6000/c6000/bios/lib" -i"d:/ticcs6000/c6000/rtdx/lib" -i"d:/ticcs6000/c6000/xdais/lib" -i"d:/ticcs6000/c6000/cgtools/lib"
+"E:\04.Temp\01.MP3Encoder\bin\MP3Encoder.obj"
+"E:\04.Temp\01.MP3Encoder\bin\MP3Encodercfg.obj"
+"E:\04.Temp\01.MP3Encoder\bin\MP3Encodercfg_c.obj"
+"E:\04.Temp\01.MP3Encoder\MP3Encoder.cmd"
+"E:\04.Temp\01.MP3Encoder\MP3Encodercfg.cmd"

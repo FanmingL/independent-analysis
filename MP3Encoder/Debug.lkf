@@ -1,0 +1,6 @@
+-z -c -m"./Debug/MP3Encoder.map" -o"./Debug/MP3Encoder.out" -w -x -i"E:/CCStudio/c6000/bios/lib" -i"E:/CCStudio/C6000/rtdx/lib" -i"E:/CCStudio/c6000/xdais/lib" -i"E:/CCStudio/C6000/cgtools/lib"
+"F:\MP3\Projects\MP3Encoder\Debug\MP3Encoder.obj"
+"F:\MP3\Projects\MP3Encoder\Debug\MP3Encodercfg.obj"
+"F:\MP3\Projects\MP3Encoder\Debug\MP3Encodercfg_c.obj"
+"F:\MP3\Projects\MP3Encoder\MP3Encodercfg.cmd"
+"F:\MP3\Projects\MP3Encoder\MP3Encoder.cmd"
