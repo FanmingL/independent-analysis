@@ -38,6 +38,7 @@ typedef struct
     int data_buffer_count;
     int effective_length;
     Matf *data_windowed;
+    Matf* temp_process;
     Matc *gradient_unmix,
     *temp1_unmix,
     *R_temp_unmix,
@@ -50,7 +51,7 @@ typedef struct
 }iva_t;
 typedef iva_t* iva_tP;
 extern iva_t iva_instance;
-
+void my_sys_init(void);
 void iva_init(iva_tP iva_it, int fft_length, int source_num,
               int shift_size, float beta, float eta);
 float** iva_step(iva_tP iva_it, float *data);

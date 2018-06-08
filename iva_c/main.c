@@ -17,6 +17,7 @@
 #ifndef FFT_LEN
 #define FFT_LEN 512
 #endif
+#define SHIFT_SIZE (FFT_LEN / 4)
 
 int main(int argc, char** argv)
 {
@@ -24,11 +25,11 @@ int main(int argc, char** argv)
     float buffer[640000][2];
     float **out_signal;
     clock_t start,end, period = 0;
-    matrice_sys_init(MAX_SIZE_REAL, MAX_SIZE_COMPLEX);
-    iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, FFT_LEN / 4, 0.5f, 0.11f);
+    matrice_sys_init(MAX_SIZE_REAL, MAX_SIZE_COMPLEX, SOURCE_NUM);
+    iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, SHIFT_SIZE, 0.5, 0.1);
+    fft_init(FFT_LEN, SOURCE_NUM);
     
-    
-    fp=fopen("/Users/erdou/Documents/GitHub/independent-analysis/iva_c/data.prototxt","r");
+    fp=fopen("/Users/erdou/Documents/MacToWin/Share/audio/data.prototxt","r");
     fp2=fopen("/Users/erdou/Documents/GitHub/independent-analysis/iva_c/out.prototxt","w");
     if ( fp )
     {

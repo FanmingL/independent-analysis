@@ -6,9 +6,13 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include "iva.h"
-
+#include <iva.h>
 iva_t iva_instance;
+
+void my_sys_init(void)
+{
+
+}
 
 void iva_init(iva_tP iva_it, int fft_length, int source_num, int shift_size, float beta, float eta)
 {
@@ -43,6 +47,7 @@ void iva_init(iva_tP iva_it, int fft_length, int source_num, int shift_size, flo
     NEW_MULTI_MAT_COMPLEX(iva_it->temp_c1_unmix, source_num, source_num, 1);
     NEW_MULTI_MAT_COMPLEX(iva_it->temp_c2_unmix, 1, source_num, 1);
     NEW_MULTI_MAT_COMPLEX(iva_it->temp_c3_unmix, 1, source_num, 1);
+    NEW_MULTI_MAT_REAL(iva_it->temp_process, 1, source_num, 1);
     
     for (i = 0; i<iva_it->effective_length; i++)
     {
@@ -57,9 +62,10 @@ void iva_exit(iva_tP iva_it)
 {
     
 }
-
+int test_flag = 0;
 float** iva_step(iva_tP iva_it, float *data)
 {
+    if (test_flag == 0)test_flag=1;
     memcpy(iva_it->data_buffer->data[iva_it->data_buffer_count++], data,
            iva_it->source_num*sizeof(float));
     if ((iva_it->data_buffer_count) == iva_it->shift_size)
@@ -75,7 +81,7 @@ float** iva_step(iva_tP iva_it, float *data)
 
 void iva_process(iva_tP iva_it)
 {
-    MatfP temp = matf_zeros(1, iva_it->source_num);
+	matf_set_zeros(iva_it->temp_process);
     
     matf_row_mul(iva_it->data_input, iva_it->window, iva_it->data_windowed);
     
@@ -86,9 +92,9 @@ void iva_process(iva_tP iva_it)
 
     iva_norm_matrix(iva_it, iva_it->unmix_matrix, iva_it->norm_matrix, iva_it->effective_length, iva_it->source_num);
     
-    matc_metrix(iva_it->data_estimate, temp);
+    matc_metrix(iva_it->data_estimate, iva_it->temp_process);
 
-    matc_real_col_div(iva_it->data_estimate, temp, iva_it->Phi);
+    matc_real_col_div(iva_it->data_estimate, iva_it->temp_process, iva_it->Phi);
 
     iva_unmix_matrix_update(iva_it, iva_it->unmix_matrix, iva_it->ksi, iva_it->Phi, iva_it->data_estimate, iva_it->effective_length, iva_it->source_num, iva_it->eta);
     
@@ -103,7 +109,6 @@ void iva_process(iva_tP iva_it)
     iva_frame_shift(iva_it->shift_size, iva_it->fft_length, iva_it->source_num,
                     iva_it->data_overlapadd->data);
     iva_frame_cat_zeros(iva_it->shift_size, iva_it->fft_length, iva_it->source_num, iva_it->data_overlapadd->data);
-    free_matf(temp, 1);
 }
 
 void iva_frame_shift(int shift_size, int fft_length, int source_num, float **data)
@@ -158,21 +163,27 @@ void iva_estimate(iva_tP iva_it, MatcP signal_obs, MatcP unmix, MatcP out, int f
 
 
 #else
-     int col, row;
-     c_num temp1, temp2;
+     //int col, row;
+     //c_num temp1, temp2;
      for (i = 0; i < fft_length; i++)
-     {
-         for (col = 0; col < source_num; col++)
-         {
-             c_set_zero(&temp1, 0);
-             for (row = 0; row < source_num; row++)
-             {
-                 c_mul(&(signal_obs->data[i][row]), &((unmix + i)->data[col][row]), &temp2);
-                 c_add(&temp1, &temp2, &temp1);
-             }
-             out->data[i][col] = temp1;
-         }
+     {    	 out->data[i][0].real = ((*(unmix + i)).data)[0][0].real * signal_obs->data[i][0].real +
+    	         		((*(unmix + i)).data)[0][1].real * signal_obs->data[i][1].real -
+    	         		((*(unmix + i)).data)[0][0].imag * signal_obs->data[i][0].imag -
+    	         		((*(unmix + i)).data)[0][1].imag * signal_obs->data[i][1].imag;
+    	 out->data[i][0].imag = ((*(unmix + i)).data)[0][0].imag * signal_obs->data[i][0].real +
+    	         		((*(unmix + i)).data)[0][1].imag * signal_obs->data[i][1].real +
+    	         		((*(unmix + i)).data)[0][0].real * signal_obs->data[i][0].imag+
+    	         		((*(unmix + i)).data)[0][1].real * signal_obs->data[i][1].imag;
+    	 out->data[i][1].real = ((*(unmix + i)).data)[1][0].real * signal_obs->data[i][0].real +
+    	 	         		((*(unmix + i)).data)[1][1].real * signal_obs->data[i][1].real -
+    	 	         		((*(unmix + i)).data)[1][0].imag * signal_obs->data[i][0].imag -
+    	 	         		((*(unmix + i)).data)[1][1].imag * signal_obs->data[i][1].imag;
+    	 out->data[i][1].imag = ((*(unmix + i)).data)[1][0].imag * signal_obs->data[i][0].real +
+	         		((*(unmix + i)).data)[1][1].real * signal_obs->data[i][1].imag +
+	         		((*(unmix + i)).data)[1][0].real * signal_obs->data[i][0].imag +
+	         		((*(unmix + i)).data)[1][1].imag * signal_obs->data[i][1].real;
      }
+
 #endif
     
     
@@ -244,18 +255,50 @@ void iva_est_update(iva_tP iva_it, MatcP est, MatcP norm, int fft_length, int so
     matc_copy(iva_it->temp_est, est);
 }
 
+/*
+ void c_div(c_num *_a, c_num *_b, c_num *out)
+ {
+ float sum_temp = _b->real * _b->real + _b->imag * _b->imag;
+ out->real = (_a->real * _b->real + _a->imag * _b->imag ) / sum_temp;
+ out->imag = (_a->imag * _b->real - _a->real * _b->imag ) / sum_temp;
+ }
+ 
+ */
+#define VAL_DIV(x,y,out,abs_y) out.real = (x.real * y.real + x.imag * y.imag ) / abs_y;\
+out.imag = (x.imag * y.real - x.real * y.imag ) / abs_y;
 void iva_norm_matrix(iva_tP iva_it, MatcP unmix, MatcP norm, int fft_length, int source_num)
 {
     int i = 0, t = 0;
+    c_num det_val ;
+    float abs_y = 0;
     for (i = 0; i < fft_length; i++)
     {
+#if 0
         matc_inverse(unmix + i, iva_it->temp_norm);
         for (t = 0; t < source_num; t++)
         {
             norm->data[i][t] = iva_it->temp_norm->data[t][t];
         }
+#else
+        /*x_inverse = [x(2,2), - x(1,2);-x(2,1), x(1,1)] / (x(1,1) * x(2,2) -x(1,2) * x(2,1));*/
+        det_val.real = ((*(unmix + i)).data)[0][0].real * ((*(unmix + i)).data)[1][1].real-
+        ((*(unmix + i)).data)[0][0].imag * ((*(unmix + i)).data)[1][1].imag-(
+                                                                             ((*(unmix + i)).data)[0][1].real * ((*(unmix + i)).data)[1][0].real-
+                                                                             ((*(unmix + i)).data)[0][1].imag * ((*(unmix + i)).data)[1][0].imag
+                                                                             );
+        det_val.imag = ((*(unmix + i)).data)[0][0].imag * ((*(unmix + i)).data)[1][1].real+
+        ((*(unmix + i)).data)[0][0].real * ((*(unmix + i)).data)[1][1].imag-(
+                                                                             ((*(unmix + i)).data)[0][1].imag * ((*(unmix + i)).data)[1][0].real+
+                                                                             ((*(unmix + i)).data)[0][1].real * ((*(unmix + i)).data)[1][0].imag
+                                                                             );
+        abs_y = det_val.real*det_val.real+det_val.imag*det_val.imag;
+        VAL_DIV((((*(unmix + i)).data)[1][1]),det_val,(norm->data[i][0]),abs_y);
+        VAL_DIV((((*(unmix + i)).data)[0][0]),det_val,(norm->data[i][1]),abs_y);
+        
+#endif
     }
 }
+
 
 
 

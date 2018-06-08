@@ -6,7 +6,14 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include "matrix.h"
+#include <matrix.h>
+#define VAL_ADD(x,y,out) out.real = x.real + y.real;\
+							out.imag = x.imag + y.imag;
+#define VAL_MUL(x,y,out) out.real = x.real * y.real - x.imag * y.imag;\
+							out.imag = x.real * y.imag + x.imag * y.real;
+#define VAL_SUB(x,y,out) out.real = x.real - y.real;\
+							out.imag = x.imag - y.imag;
+Matc* L_g, *L_inverse_g, *U_g, *U_inverse_g;
 //_out = _a + _b
 void c_add(c_num *_a, c_num *_b, c_num *_out)
 {
@@ -138,6 +145,7 @@ void matf_reallocate(MatfP _data, int size_in, int rows, int cols, int _size)
 }
 
 //create a matrix
+
 MatfP matf_create(int rows, int cols, int _size)
 {
     Matf *_data;
@@ -153,6 +161,7 @@ MatfP matf_create(int rows, int cols, int _size)
             MY_MEM_ALLOCATE(*((_data + _size - 1)->data + i), cols, float);
         }
     }
+
     return _data;
 }
 
@@ -267,10 +276,12 @@ MatfP matf_add(MatfP _a, MatfP _b, MatfP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -290,10 +301,12 @@ MatfP matf_sub(MatfP _a, MatfP _b, MatfP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -313,10 +326,12 @@ MatfP matf_cwise_mul(MatfP _a, MatfP _b, MatfP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -334,10 +349,12 @@ MatfP matf_row_mul(MatfP _a, MatfP _b, MatfP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -357,10 +374,12 @@ MatfP matf_real_mul(MatfP _a, float _b, MatfP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -381,10 +400,12 @@ MatfP matf_real_div(MatfP _a, float _b,MatfP _out)
 #endif
     int col, row;
     _b = 1 / _b;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -404,10 +425,12 @@ MatfP matf_cwise_div(MatfP _a, MatfP _b, MatfP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -427,10 +450,12 @@ MatfP matf_mul(MatfP _a, MatfP _b,MatfP _out)
 #endif
     int row, col, mul_index;
     float _temp;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _b->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _b->cols, 1);
     }
+#endif
     for (row = 0; row < _out->rows; row++)
     {
         for (col = 0; col < _out->cols; col++)
@@ -449,10 +474,12 @@ MatfP matf_mul(MatfP _a, MatfP _b,MatfP _out)
 MatfP matf_copy(MatfP _a, MatfP _out)
 {
     int row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         memcpy(_out->data[row], _a->data[row], _a->cols * sizeof(float));
@@ -471,10 +498,12 @@ void swap(float *_a, float *_b)
 MatfP matf_transpose(MatfP _a, MatfP _out)
 {
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->cols || _out->cols != _a->rows)
     {
         matf_reallocate(_out, 1, _a->cols, _a->rows, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -492,6 +521,7 @@ void matf_LU_compose(MatfP _a, MatfP _out_L, MatfP _out_U)
 #endif
     int i, j, k, N=_a->rows;
     float s;
+#if ENABLE_ASSERT
     if (_out_U->rows != _a->rows || _out_U->cols != _a->cols)
     {
         matf_reallocate(_out_U, 1, _a->rows, _a->cols, 1);
@@ -500,7 +530,7 @@ void matf_LU_compose(MatfP _a, MatfP _out_L, MatfP _out_U)
     {
         matf_reallocate(_out_L, 1, _a->rows, _a->cols, 1);
     }
-    
+#endif
     for (i = 0; i < N; i++)
     {
         memset(_out_L->data[i], 0, N * sizeof(float));
@@ -548,10 +578,12 @@ MatfP matf_inverse(MatfP _a, MatfP _out)
     L_inverse = matf_eye(N, N),
     U = matf_zeros(N, N),
     U_inverse = matf_zeros(N, N);
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     /* here start caculate the L and U, det(L) = 1 */
     for (i = 0;i < N;i++)
     {
@@ -876,10 +908,12 @@ MatcP matc_add(MatcP _a, MatcP _b, MatcP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -899,10 +933,12 @@ MatcP matc_sub(MatcP _a, MatcP _b, MatcP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -922,10 +958,12 @@ MatcP matc_cwise_mul(MatcP _a, MatcP _b, MatcP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -945,10 +983,12 @@ MatcP matc_complex_mul(MatcP _a, c_num *_b, MatcP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -970,10 +1010,12 @@ MatcP matc_complex_div(MatcP _a, c_num *_b,MatcP _out)
     int col, row;
     c_num _temp;
     c_real_div(_b, 1, &_temp);
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -993,10 +1035,12 @@ MatcP matc_cwise_div(MatcP _a, MatcP _b, MatcP _out)
     assert(_out != NULL);
 #endif
     int col, row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -1007,6 +1051,12 @@ MatcP matc_cwise_div(MatcP _a, MatcP _b, MatcP _out)
     return _out;
 }
 
+
+/*
+ *  _out->real = _a->real * _b->real - _a->imag * _b->imag;
+    _out->imag = _a->real * _b->imag + _a->imag * _b->real;
+ */
+
 //_out = _a * _b
 MatcP matc_mul(MatcP _a, MatcP _b,MatcP _out)
 {
@@ -1016,11 +1066,12 @@ MatcP matc_mul(MatcP _a, MatcP _b,MatcP _out)
 #endif
     int row, col, mul_index;
     c_num _temp;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _b->cols)
     {
-        matc_reallocate(_out, 1, _a->rows, _b->cols, 1);
+        (_out, 1, _a->rows, _b->cols, 1);
     }
-    
+#endif
     for (row = 0; row < _out->rows; row++)
     {
         
@@ -1030,8 +1081,10 @@ MatcP matc_mul(MatcP _a, MatcP _b,MatcP _out)
             
             for (mul_index = 0; mul_index < _a->cols; mul_index++)
             {
-                c_mul(&(_a->data[row][mul_index]), &(_b->data[mul_index][col]), &(_temp));
-                c_add(&_temp, &(_out->data[row][col]), &(_out->data[row][col]));
+
+            	VAL_MUL(_a->data[row][mul_index], _b->data[mul_index][col], _temp);
+            	VAL_ADD(_temp, _out->data[row][col], _out->data[row][col]);
+
             }
         }
     }
@@ -1045,6 +1098,7 @@ void matc_LU_compose(MatcP _a, MatcP _out_L, MatcP _out_U)
 #endif
     int i, j, k, N=_a->rows;
     c_num s1, s2;
+#if ENABLE_ASSERT
     if (_out_U->rows != _a->rows || _out_U->cols != _a->cols)
     {
         matc_reallocate(_out_U, 1, _a->rows, _a->cols, 1);
@@ -1053,7 +1107,7 @@ void matc_LU_compose(MatcP _a, MatcP _out_L, MatcP _out_U)
     {
         matc_reallocate(_out_L, 1, _a->rows, _a->cols, 1);
     }
-    
+#endif
     for (i = 0; i < N; i++)
     {
         memset(_out_L->data[i], 0, N * sizeof(c_num));
@@ -1101,14 +1155,16 @@ MatcP matc_inverse(MatcP _a, MatcP _out)
     int N = _a->rows;
     int i, j, k;
     c_num s1, s2;
-    MatcP L = matc_eye(N, N),
-    L_inverse = matc_eye(N, N),
-    U = matc_zeros(N, N),
-    U_inverse = matc_zeros(N, N);
+    matc_set_eye(L_g);
+    matc_set_eye(L_inverse_g);
+    matc_set_zeros(U_g);
+    matc_set_zeros(U_inverse_g);
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     /* here start caculate the L and U, det(L) = 1, det(U) = det(A), A = L*U, A^-1 = U^-1*L^-1 */
     for (i = 0;i < N;i++)
     {
@@ -1117,10 +1173,10 @@ MatcP matc_inverse(MatcP _a, MatcP _out)
             c_set_zero(&s1, 1);
             for (k = 0;k < i;k++)
             {
-                c_mul(&(L->data[i][k]), &(U->data[k][j]), &(s2));
-                c_add(&(s2), &(s1), &s1);
+            	VAL_MUL(L_g->data[i][k], U_g->data[k][j], s2);
+            	VAL_ADD(s2, s1, s1);
             }
-            c_sub(&(_a->data[i][j]), &(s1), &(U->data[i][j]));
+            VAL_SUB(_a->data[i][j], s1, U_g->data[i][j]);
         }
         
         for (j = i + 1;j < N;j++)
@@ -1128,11 +1184,11 @@ MatcP matc_inverse(MatcP _a, MatcP _out)
             c_set_zero(&s1, 1);
             for (k = 0; k < i; k++)
             {
-                c_mul(&(L->data[j][k]), &(U->data[k][i]), &(s2));
-                c_add(&(s2), &(s1), &s1);
+            	VAL_MUL((L_g->data[j][k]), (U_g->data[k][i]), (s2));
+            	VAL_ADD(s2, s1, s1);
             }
-            c_sub(&(_a->data[j][i]), &(s1), &(s2));
-            c_div(&(s2), &(U->data[i][i]), &(L->data[j][i]));
+            VAL_SUB(_a->data[j][i], s1, s2);
+            c_div(&(s2), &(U_g->data[i][i]), &(L_g->data[j][i]));
         }
     }
 #if ENABLE_ASSERT
@@ -1149,16 +1205,16 @@ MatcP matc_inverse(MatcP _a, MatcP _out)
             c_set_zero(&s1, 1);
             for (k = 0;k < i;k++)
             {
-                c_mul(&(L->data[i][k]), &(L_inverse->data[k][j]), &(s2));
-                c_sub(&(s1), &(s2), &s1);
+            	VAL_MUL(L_g->data[i][k], L_inverse_g->data[k][j], s2);
+            	VAL_SUB(s1, s2, s1);
             }
-            L_inverse->data[i][j] = s1;
+            L_inverse_g->data[i][j] = s1;
         }
     }
     /* here start caculate the inverse of U */
     for (i = 0;i < N;i++)
     {
-        real_c_div(1, &(U->data[i][i]), &(U_inverse->data[i][i]));
+        real_c_div(1, &(U_g->data[i][i]), &(U_inverse_g->data[i][i]));
     }
     for (i = 1;i < N;i++)
     {
@@ -1167,17 +1223,13 @@ MatcP matc_inverse(MatcP _a, MatcP _out)
             c_set_zero(&s1, 1);
             for (k = j + 1;k <= i;k++)
             {
-                c_mul(&(U->data[j][k]), &(U_inverse->data[k][i]), &(s2));
-                c_sub(&(s1), &(s2), &s1);
+            	VAL_MUL(U_g->data[j][k], U_inverse_g->data[k][i], s2);
+            	VAL_SUB(s1, s2, s1);
             }
-            c_div(&(s1), &(U->data[j][j]), &(U_inverse->data[j][i]));
+            c_div(&(s1), &(U_g->data[j][j]), &(U_inverse_g->data[j][i]));
         }
     }
-    matc_mul(U_inverse, L_inverse, _out);
-    free_matc(L, 1);
-    free_matc(U, 1);
-    free_matc(L_inverse, 1);
-    free_matc(U_inverse, 1);
+    matc_mul(U_inverse_g, L_inverse_g, _out);
     return _out;
 }
 
@@ -1234,10 +1286,12 @@ c_num matc_det(MatcP _a)
 MatcP matc_transpose(MatcP _a, MatcP _out)
 {
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->cols || _out->cols != _a->rows)
     {
         matc_reallocate(_out, 1, _a->cols, _a->rows, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -1251,10 +1305,12 @@ MatcP matc_transpose(MatcP _a, MatcP _out)
 MatcP matc_conj(MatcP _a, MatcP _out)
 {
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -1280,10 +1336,12 @@ void matc_set_conj(MatcP _a)
 MatcP matc_real_mul(MatcP _a, float _b, MatcP _out)
 {
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for(col = 0; col < _a->cols; col++)
@@ -1301,10 +1359,12 @@ MatcP matc_real_cwise_mul(MatcP _a, MatfP _b, MatcP _out)
     assert(_a->cols==_b->cols);
 #endif
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for(col = 0; col < _a->cols; col++)
@@ -1321,10 +1381,12 @@ MatcP matc_real_row_mul(MatcP _a, MatfP _b, MatcP _out)
     assert(_a->rows==_b->rows);
 #endif
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for(col = 0; col < _a->cols; col++)
@@ -1340,7 +1402,7 @@ Matf *__REAL_BASE__;
 Matc *__COMPLEX_BASE__;
 int __MATRICE_INTI__=0;
 int __MULTI_TEMP_COUNT__ = 0;
-int matrice_sys_init(int max_size_real, int max_size_complex)
+int matrice_sys_init(int max_size_real, int max_size_complex, int source_num)
 {
     if (__MATRICE_INTI__==0)
     {
@@ -1354,6 +1416,10 @@ int matrice_sys_init(int max_size_real, int max_size_complex)
 #if ENABLE_TIME
         srand((unsigned) time(NULL));
 #endif
+        NEW_MULTI_MAT_COMPLEX(L_g, source_num, source_num, 1);
+        NEW_MULTI_MAT_COMPLEX(U_g, source_num, source_num, 1);
+        NEW_MULTI_MAT_COMPLEX(L_inverse_g, source_num, source_num, 1);
+        NEW_MULTI_MAT_COMPLEX(U_inverse_g, source_num, source_num, 1);
         return 0;
     }
     return 1;
@@ -1493,10 +1559,12 @@ void matf_set_rectwin(MatfP rect_win)
 void matf_convert2com(MatfP _a, MatcP _out)
 {
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -1510,10 +1578,12 @@ void matf_convert2com(MatfP _a, MatcP _out)
 void matc_convert2real(MatcP _a, MatfP _out)
 {
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -1526,10 +1596,12 @@ void matc_convert2real(MatcP _a, MatfP _out)
 MatcP matc_copy(MatcP _a, MatcP _out)
 {
     int row;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows; row++)
     {
         memcpy(_out->data[row], _a->data[row], _a->cols * sizeof(c_num));
@@ -1544,10 +1616,12 @@ MatcP matc_real_col_div(MatcP _a, MatfP _b, MatcP _out)
     assert(_a->cols == _b->cols);
 #endif
     int row, col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     for (row = 0; row < _a->rows ; row++)
     {
         for (col = 0; col < _a->cols; col++)
@@ -1563,10 +1637,12 @@ MatfP matc_metrix(MatcP _a, MatfP _out)
 {
     int row, col;
     float temp;
+#if ENABLE_ASSERT
     if (_out->rows != 1 || _out->cols != _a->cols)
     {
         matf_reallocate(_out, 1, 1, _a->cols, 1);
     }
+#endif
     for (col = 0; col < _a->cols; col ++)
     {
         temp = 0;
@@ -1584,10 +1660,12 @@ MatfP matc_metrix(MatcP _a, MatfP _out)
 MatcP matc_select_diag(MatcP _a, MatcP _out)
 {
     int col;
+#if ENABLE_ASSERT
     if (_out->rows != _a->rows || _out->cols != _a->cols)
     {
         matc_reallocate(_out, 1, _a->rows, _a->cols, 1);
     }
+#endif
     matc_set_zeros(_out);
     for (col = 0; col < MY_MIN(_a->cols, _a->rows); col++)
     {

@@ -10,9 +10,9 @@
 #define ENABLE_ASSERT 0
 #define ENABLE_TIME 0
 
-#include "stdlib.h"
-#include "string.h"
-#include "time.h"
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include <math.h>
 #define MY_MEM_ALLOCATE(VAR_PTR, NUM, TYPE)  {VAR_PTR = ((TYPE*)(malloc((NUM) * sizeof(TYPE))));}
 #if ENABLE_ASSERT
@@ -110,7 +110,7 @@ typedef Matc*const MatcP;
 extern int __BASE_NUM_REAL__, __BASE_NUM_COMPLEX__, __MAX_SIZE_REAL__, __MAX_SIZE_COMPLEX__, __MATRICE_INTI__, __MULTI_TEMP_COUNT__ ;
 extern Matf *__REAL_BASE__;
 extern Matc *__COMPLEX_BASE__;
-int matrice_sys_init(int max_size_real, int max_size_complex);
+int matrice_sys_init(int max_size_real, int max_size_complex, int source_num);
 void matrice_sys_exit(void);
 void c_add(c_num *_a, c_num *_b, c_num *_out);
 void c_set_zero(c_num *_a, int _size);

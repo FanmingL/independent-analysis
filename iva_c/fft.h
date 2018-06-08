@@ -7,7 +7,7 @@
 
 #ifndef _FFT_H
 #define _FFT_H
-#include "matrix.h"
+#include <matrix.h>
 #include <math.h>
 #define NOT2POW(a) (((a)-1)&(a)||(a)<=0)
 MatcP fft(MatcP signal, MatcP fft_signal);
@@ -18,4 +18,5 @@ MatcP fft_real(MatfP signal, MatcP fft_signal);
 MatfP ifft_real(MatcP fft_signal, MatfP signal);
 MatfP hanning_window_get(int fft_length);
 MatfP add_win_real(MatfP win, MatfP signal, MatfP signal_out);
+void fft_init(int fft_length, int source_num);
 #endif
