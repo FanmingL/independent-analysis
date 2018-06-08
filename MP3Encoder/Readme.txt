@@ -1,2 +1,1 @@
-说明：
-通过BIOS在DEC6713上实现了音频的采样与播放！没有加入算法！
+IVA algorithm implemented on DEC6713 DSP.
