@@ -265,7 +265,7 @@ void iva_est_update(iva_tP iva_it, MatcP est, MatcP norm, int fft_length, int so
  }
 
  */
-#define VAL_DIV(x,y,out,abs_y) out.real = (x.real * y.real + x.imag * y.imag ) / abs_y;\
+#define VAL_DIV(x,y,out,abs_y) out.real = (x.real * y.real + x.imag * y.imag ) * abs_y;\
 out.imag = (x.imag * y.real - x.real * y.imag ) / abs_y;
 void iva_norm_matrix(iva_tP iva_it, MatcP unmix, MatcP norm, int fft_length, int source_num)
 {
@@ -292,7 +292,7 @@ void iva_norm_matrix(iva_tP iva_it, MatcP unmix, MatcP norm, int fft_length, int
                                                                              ((*(unmix + i)).data)[0][1].imag * ((*(unmix + i)).data)[1][0].real+
                                                                              ((*(unmix + i)).data)[0][1].real * ((*(unmix + i)).data)[1][0].imag
                                                                              );
-        abs_y = det_val.real*det_val.real+det_val.imag*det_val.imag;
+        abs_y = 1 / (det_val.real*det_val.real+det_val.imag*det_val.imag);
         VAL_DIV((((*(unmix + i)).data)[1][1]),det_val,(norm->data[i][0]),abs_y);
         VAL_DIV((((*(unmix + i)).data)[0][0]),det_val,(norm->data[i][1]),abs_y);
 

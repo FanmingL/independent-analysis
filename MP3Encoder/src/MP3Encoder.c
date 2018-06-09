@@ -87,7 +87,7 @@ Void main()
 	//MCASP_Handle hMcasp = (MCASP_Handle)EC6713_AIC23_OpenCodec();
 	//DEC6713_LED_init();
 	//pll_set();
-	DEC6713_init();
+	//DEC6713_init();
 	//pll_set();
 	PLL_RSET(PLLM, 24);
 	led_configuration();
@@ -127,17 +127,23 @@ int echoAtt = 64;
 float double_buffer[2];
 float **out_buffer;
 #define SHORT_MAX  32768
+#define RATIO (1.0f / 32768)
+#define VAL
 void PlayAudio(short *inBuf, short *outBuf)
 {
 	int i,j;
+
 	for(i=0;i<BUFLEN;i+=2)
 	{
-		double_buffer[0] = ((float)(*(inBuf++))) / SHORT_MAX;
-		double_buffer[1] = ((float)(*(inBuf++))) / SHORT_MAX;
+		double_buffer[0] = ((float)(*(inBuf++))) * RATIO;
+		double_buffer[1] = ((float)(*(inBuf++))) * RATIO;
 		if ((out_buffer = iva_step(&iva_instance, double_buffer))!=NULL)
 		{
 			for (j = 0; j < SHIFT_SIZE; j++)
 			{
+				//out_buffer[j][0] = (out_buffer[j][0] > 1) ? 1 : ( (out_buffer[j][0] < -1) ? -1 :out_buffer[j][0]);
+				//out_buffer[j][1] = (out_buffer[j][1] > 1) ? 1 : ( (out_buffer[j][1] < -1) ? -1 :out_buffer[j][1]);
+
 				*outBuf++ = (short)(out_buffer[j][0] * SHORT_MAX);
 				*outBuf++ = (short)(out_buffer[j][1] * SHORT_MAX);
 			}
@@ -163,13 +169,13 @@ static Void createStreams()
     inStream = SIO_create("/dio_codec", SIO_INPUT, BUFSIZE, &attrs);
     LOG_printf(&trace, "echo started");
     if (inStream == NULL) {
-    	while(1);
+    	//while(1);
         SYS_abort("Create input stream FAILED.");
     }
 
     outStream = SIO_create("/dio_codec", SIO_OUTPUT, BUFSIZE, &attrs);
     if (outStream == NULL) {
-    	while(1);
+    	//while(1);
         SYS_abort("Create output stream FAILED.");
     }
 }
@@ -223,6 +229,7 @@ static Void prime()
  * easily replace the copy function with a signal processing algorithm. 
  */
 short *inbuf, *outbuf;
+int slank_time=0;
 Void tsk_Audio()
 {
     Int nmadus;         /* number of minimal addressable units */
@@ -251,7 +258,12 @@ Void tsk_Audio()
 
 		/* process echo algorithm */
 		PlayAudio(inbuf, outbuf);
-		led_toggle();
+		if(slank_time++==20)
+		{
+			led_toggle();
+			slank_time = 0;
+		}
+
         /* Issue full buffer to the output stream */
         if (SIO_issue(outStream, outbuf, nmadus, NULL) != SYS_OK) {
             SYS_abort("Error issuing full buffer to the output stream");
