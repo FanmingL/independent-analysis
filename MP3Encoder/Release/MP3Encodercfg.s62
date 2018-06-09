@@ -5,7 +5,7 @@
 ;; INPUT MP3Encoder.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Fri Jun 08 01:27:32 2018", VERS$DATE
+	.asg "Sat Jun 09 17:02:17 2018", VERS$DATE
 
 ;; PROLOGUE
 	.include MP3Encodercfg.h62
@@ -46,7 +46,7 @@
 	.include hook.h62
 
 ;; TYPE ATTRIBUTES
-MEM$NUMOF           .set 2
+MEM$NUMOF           .set 3
 MEM$SETOF           .set 00H
 OBJ$NUMOF           .set 0
 OBJ$SETOF           .set 00H
@@ -403,7 +403,7 @@ HOOK$SETOF          .set 00H
 	HST_config  _RTDX, _DSM, _NONE, _MAXFRAMESET, _MAXFRAMEALLOWED, _DSMBUFSEG, _DSMMEMSIZE
 
 ;; ======== HWI_config ========
-	.asg 01H, _ZEROTAB
+	.asg 00H, _ZEROTAB
 	.asg 00H, _GENERATE_RESET_VEC
 	.asg 00H, _POLARITYMASK
 	.asg 0310718a4H, _INTRMULTLOW
@@ -540,7 +540,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; MEM_Obj IRAM (len, iAllocHeap, iSegZero, iHeapId)
 	.global IRAM
-	.asg 040000H, _len
+	.asg 03fc00H, _len
 	.asg 01H, _iAllocHeap
 	.asg IRAM, _iSegZero
 	.asg segment_name, _iHeapId
@@ -556,6 +556,17 @@ HOOK$SETOF          .set 00H
 	.asg IRAM, _iSegZero
 	.asg _extHeap, _iHeapId
 	MEM_Obj 1, SDRAM, 0, _len, _iAllocHeap, _iSegZero, _iHeapId
+
+;; ======== MEM_Obj BOOT_SEC ========
+;; <add comments here>
+;;
+;; MEM_Obj BOOT_SEC (len, iAllocHeap, iSegZero, iHeapId)
+	.global BOOT_SEC
+	.asg 0400H, _len
+	.asg 00H, _iAllocHeap
+	.asg IRAM, _iSegZero
+	.asg segment_name, _iHeapId
+	MEM_Obj 1, BOOT_SEC, 0, _len, _iAllocHeap, _iSegZero, _iHeapId
 
 ;; ======== CLK_Obj PRD_clock ========
 ;; This clock function calls PRD_tick from within the on-chip timer ISR

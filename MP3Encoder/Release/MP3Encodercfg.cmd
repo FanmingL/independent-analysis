@@ -69,6 +69,7 @@ GIO_POSTFXN = _SEM_post;
 /* OBJECT ALIASES */
 _IRAM = IRAM;
 _SDRAM = SDRAM;
+_BOOT_SEC = BOOT_SEC;
 _PRD_clock = PRD_clock;
 _RTA_fromHost = RTA_fromHost;
 _RTA_toHost = RTA_toHost;
@@ -100,9 +101,9 @@ _IDL_busyObj = IDL_busyObj;
 
 /* MODULE GBL */
 
-SECTIONS {
-   .vers (COPY): {} /* version information */
-}
+//SECTIONS {
+ //  .vers (COPY): {} /* version information */
+//}
 
 -priority
 --trampolines
@@ -119,10 +120,11 @@ SECTIONS {
 _GBL_CACHE = GBL_CACHE;
 
 /* MODULE MEM */
--stack 0x900
+-stack 0x1300
 MEMORY {
-   IRAM        : origin = 0x0,         len = 0x40000
+   IRAM        : origin = 0x400,       len = 0x3fc00
    SDRAM       : origin = 0x80000000,  len = 0x1000000
+   BOOT_SEC    : origin = 0x0,         len = 0x400
 }
 /* MODULE CLK */
 SECTIONS {
@@ -156,14 +158,6 @@ _LNK_readDone = LNK_readDone;
 _LNK_readFail = LNK_readFail; 
 _LNK_readPend = LNK_readPend; 
 _LNK_writeFail = LNK_writeFail;
-/* MODULE HWI */
-SECTIONS {
-    .hwi_vec: 0x0 {
-        HWI_A_VECS = .;
-        *(.hwi_vec)
-    }
-}
-
 _HWI_CFGDISPATCHED = HWI_CFGDISPATCHED;
 
 /* MODULE SWI */
@@ -200,9 +194,15 @@ PIP_A_TABLEN = 2;
 SECTIONS {
         .bss:     {} > IRAM
 
+        .hwi_vec: {
+            *(.hwi_vec)
+        } align = 0x400, RUN_START(HWI_A_VECS) > IRAM
+
         .far:     {} > IRAM
 
         .sysdata: {} > IRAM
+
+        .dio: {} > IRAM
 
         .udev: {} > IRAM
 
@@ -278,16 +278,14 @@ SECTIONS {
         .stack: align = 0x8 {
             GBL_stackbeg = .;
             *(.stack)
-            GBL_stackend = GBL_stackbeg + 0x900 - 1;
-            _HWI_STKBOTTOM = GBL_stackbeg + 0x900 - 8;
+            GBL_stackend = GBL_stackbeg + 0x1300 - 1;
+            _HWI_STKBOTTOM = GBL_stackbeg + 0x1300 - 8;
             _HWI_STKTOP = GBL_stackbeg;
         } > IRAM
 
         .IRAM$heap: {
-            . += 0x15000;
+            . += 0x1a000;
         } RUN_START(IRAM$B), RUN_START(_IRAM_base), RUN_SIZE(IRAM$L), RUN_SIZE(_IRAM_length) > IRAM
-
-        .dio: {} > SDRAM
 
         .dsm: {} > SDRAM
 
@@ -309,7 +307,7 @@ SECTIONS {
         } > SDRAM
 
         .SDRAM$heap: {
-            . += 0x38000;
+            . += 0x48000;
         } RUN_START(SDRAM$B), RUN_START(_SDRAM_base), RUN_SIZE(SDRAM$L), RUN_SIZE(_SDRAM_length) > SDRAM
 
 }

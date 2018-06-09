@@ -40,6 +40,7 @@
 #include <my_sys.h>
 #include <iva.h>
 #include <csl_pll.h>
+#include <led.h>
 #define NUM_CODEC_CHANNELS	 2	/* stereo: left + right		*/
 #define SAMPLEING_RATE		8	/* 8 samples/ms			*/
 #define FRAME_SIZE			8	/* 10 ms					*/
@@ -89,12 +90,13 @@ Void main()
 	DEC6713_init();
 	//pll_set();
 	PLL_RSET(PLLM, 24);
+	led_configuration();
 	//tsk_Audio();
 		//iva_step(&iva_instance, tem_in);
     //LOG_printf(&trace, "echo started");
 }
 
-short *pEchoBuf;
+//short *pEchoBuf;
 const int echoBufSize = NFRAMES * BUFLEN;
 int echoBufOffset = 0;
 int delayTime = 500;
@@ -104,12 +106,12 @@ int echoAtt = 64;
  *  ======== initEchoBuffer ========
  * Allocate echo buffer and fill with silence
  */
-int initEchoBuffer()
-{
+//int initEchoBuffer()
+//{
 	//pEchoBuf = MEM_calloc(0, echoBufSize * sizeof(short), BUFALIGN);
 	//return (pEchoBuf == MEM_ILLEGAL) ? -1 : 0;
-	return 0;
-}
+//	return 0;
+//}
 
 /*
  *  ======== copyWithEcho ========
@@ -161,11 +163,13 @@ static Void createStreams()
     inStream = SIO_create("/dio_codec", SIO_INPUT, BUFSIZE, &attrs);
     LOG_printf(&trace, "echo started");
     if (inStream == NULL) {
+    	while(1);
         SYS_abort("Create input stream FAILED.");
     }
 
     outStream = SIO_create("/dio_codec", SIO_OUTPUT, BUFSIZE, &attrs);
     if (outStream == NULL) {
+    	while(1);
         SYS_abort("Create output stream FAILED.");
     }
 }
@@ -230,7 +234,7 @@ Void tsk_Audio()
     /* Call prime function to do priming */
     prime();
     
-    initEchoBuffer();
+    //initEchoBuffer();
     my_sys_init();
     /* Loop forever looping back buffers */
     for (;;) {
@@ -247,7 +251,7 @@ Void tsk_Audio()
 
 		/* process echo algorithm */
 		PlayAudio(inbuf, outbuf);
-		
+		led_toggle();
         /* Issue full buffer to the output stream */
         if (SIO_issue(outStream, outbuf, nmadus, NULL) != SYS_OK) {
             SYS_abort("Error issuing full buffer to the output stream");

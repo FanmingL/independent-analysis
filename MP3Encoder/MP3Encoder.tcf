@@ -269,6 +269,27 @@ bios.MEM.instance("IRAM").heapSize = 0x00018000;
 bios.MEM.instance("IRAM").heapSize = 0x00020000;
 bios.MEM.STACKSIZE = 0x0900;
 bios.MEM.instance("IRAM").heapSize = 0x00015000;
+bios.MEM.create("BOOT_SEC");
+bios.MEM.instance("BOOT_SEC").len = 0x00000400;
+bios.MEM.instance("BOOT_SEC").createHeap = 0;
+bios.MEM.instance("BOOT_SEC").space = "code/data";
+bios.MEM.instance("IRAM").base = 0x00000400;
+bios.MEM.instance("IRAM").len = 0x0003fc00;
+bios.MEM.instance("IRAM").heapSize = 0x00017000;
+bios.MEM.instance("IRAM").heapSize = 0x00014000;
+bios.MEM.instance("IRAM").heapSize = 0x00019000;
+bios.MEM.instance("IRAM").heapSize = 0x00014000;
+bios.MEM.MALLOCSEG = prog.get("SDRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00004000;
+bios.MEM.instance("IRAM").len = 0x0002fc00;
+bios.MEM.instance("SDRAM").heapSize = 0x00048000;
+bios.MEM.instance("IRAM").len = 0x0003fc00;
+bios.MEM.instance("IRAM").heapSize = 0x00014000;
+bios.MEM.MALLOCSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x00015000;
+bios.MEM.STACKSIZE = 0x1300;
+bios.DIO.OBJMEMSEG = prog.get("IRAM");
+bios.MEM.instance("IRAM").heapSize = 0x0001a000;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 if (config.hasReportedError == false) {

@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Fri Jun 08 01:27:32 2018" { 
+    global DATE :: "Sat Jun 09 17:02:17 2018" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -1418,7 +1418,7 @@ type MEM {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 2 { 
+    global gNumOf :: 3 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -1507,7 +1507,7 @@ type MEM {
         prop NoGen :: 1
         prop TabName :: "BIOS Code"
     }
-    global STACKSIZE :: 2304 { 
+    global STACKSIZE :: 4864 { 
         prop Type :: "{3EE4CB80-E273-11d0-BB8F-0000C008F2E9}"
         prop Format :: "0x%04x"
         prop Style :: if GBL.DSPTYPE == 54 {0x01 | 0x02} else {0x02}
@@ -7937,7 +7937,7 @@ type DIO {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global OBJMEMSEG :: SDRAM { 
+    global OBJMEMSEG :: IRAM { 
         prop Type :: "{7BA2DA00-5A53-11d0-9BFE-0000C0AC14C7}"
         prop MemberType :: MEM
         prop MemberTest :: MEM.dataMember($1)
@@ -8729,10 +8729,10 @@ object IRAM :: MEM {
     param iId :: 0
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
-    param base :: 0
-    param len :: 262144
+    param base :: 1024
+    param len :: 261120
     param iAllocHeap :: 1
-    param iHeapSize :: 86016
+    param iHeapSize :: 106496
     param iUserHeapId :: 0
     param iHeapId :: @segment_name
     param iReqHeapCount :: 3
@@ -8750,7 +8750,7 @@ object SDRAM :: MEM {
     param base :: -2147483648
     param len :: 16777216
     param iAllocHeap :: 1
-    param iHeapSize :: 229376
+    param iHeapSize :: 294912
     param iUserHeapId :: 1
     param iHeapId :: @_extHeap
     param iReqHeapCount :: 0
@@ -8837,5 +8837,23 @@ object dio_codec :: DIO {
     param iDevId :: 0
     param iIsTerminal :: 1
     param iIsVirtual :: 0
+}
+
+object BOOT_SEC :: MEM {
+    param iComment :: "<add comments here>"
+    param iIsUsed :: 1
+    param iId :: 0
+    param iDelUser :: "USER"
+    param iDelMsg :: "ok"
+    param base :: 0
+    param len :: 1024
+    param iAllocHeap :: 0
+    param iHeapSize :: 32768
+    param iUserHeapId :: 0
+    param iHeapId :: @segment_name
+    param iReqHeapCount :: 0
+    param space :: "code/data"
+    param dynamicLoading :: 0
+    param iIsModifiable :: 1
 }
 

@@ -69,6 +69,9 @@
 ../bin/MP3Encoder.obj: C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/math.h
 ../bin/MP3Encoder.obj: C:/ti/ccsv5/cslc6000/include/csl_pll.h
 ../bin/MP3Encoder.obj: C:/ti/ccsv5/cslc6000/include/csl_pllhal.h
+../bin/MP3Encoder.obj: C:/Users/erdou/workspace_v5_5/MP3Encoder/include/led.h
+../bin/MP3Encoder.obj: C:/ti/ccsv5/cslc6000/include/csl_gpio.h
+../bin/MP3Encoder.obj: C:/ti/ccsv5/cslc6000/include/csl_gpiohal.h
 
 ../src/MP3Encoder.c: 
 C:/Users/erdou/workspace_v5_5/MP3Encoder/include/std.h: 
@@ -139,3 +142,6 @@ C:/Users/erdou/workspace_v5_5/MP3Encoder/include/fft.h:
 C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/math.h: 
 C:/ti/ccsv5/cslc6000/include/csl_pll.h: 
 C:/ti/ccsv5/cslc6000/include/csl_pllhal.h: 
+C:/Users/erdou/workspace_v5_5/MP3Encoder/include/led.h: 
+C:/ti/ccsv5/cslc6000/include/csl_gpio.h: 
+C:/ti/ccsv5/cslc6000/include/csl_gpiohal.h: 

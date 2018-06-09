@@ -6,6 +6,11 @@
             <instance XML_version="1.2" href="drivers/seedxds510plusc6000.xml" id="drivers" xml="seedxds510plusc6000.xml" xmlpath="drivers"/>
             <platform XML_version="1.2" id="platform_0">
                 <instance XML_version="1.2" desc="TMS320C6713" href="devices/c6713.xml" id="TMS320C6713" xml="c6713.xml" xmlpath="devices"/>
+            <device HW_revision="1" XML_version="1.2" description="C67x Floating-point DSP" id="TMS320C6713" partnum="TMS320C6713" simulation="no">
+                    <cpu HW_revision="1.0" XML_version="1.2" description="C671x CPU" deviceSim="false" id="TMS320C671X" isa="TMS320C671X">
+                        <property Type="filepathfield" Value="..\gel\DEC6713.gel" id="GEL File"/>
+                    </cpu>
+                </device>
             </platform>
         </connection>
     </configuration>
