@@ -128,15 +128,15 @@ float double_buffer[2];
 float **out_buffer;
 #define SHORT_MAX  32768
 #define RATIO (1.0f / 32768)
-#define VAL
+#define AMPLITUDE_RATIO (0.03f)
 void PlayAudio(short *inBuf, short *outBuf)
 {
 	int i,j;
 
 	for(i=0;i<BUFLEN;i+=2)
 	{
-		double_buffer[0] = ((float)(*(inBuf++))) * RATIO;
-		double_buffer[1] = ((float)(*(inBuf++))) * RATIO;
+		double_buffer[0] = ((float)(*(inBuf++))) * RATIO * AMPLITUDE_RATIO;
+		double_buffer[1] = ((float)(*(inBuf++))) * RATIO * AMPLITUDE_RATIO;
 		if ((out_buffer = iva_step(&iva_instance, double_buffer))!=NULL)
 		{
 			for (j = 0; j < SHIFT_SIZE; j++)
