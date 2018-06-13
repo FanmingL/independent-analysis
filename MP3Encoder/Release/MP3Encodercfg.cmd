@@ -102,7 +102,7 @@ _IDL_busyObj = IDL_busyObj;
 /* MODULE GBL */
 
 //SECTIONS {
- //  .vers (COPY): {} /* version information */
+//   .vers (COPY): {} /* version information */
 //}
 
 -priority
@@ -284,7 +284,7 @@ SECTIONS {
         } > IRAM
 
         .IRAM$heap: {
-            . += 0x1a000;
+            . += 0x19900;
         } RUN_START(IRAM$B), RUN_START(_IRAM_base), RUN_SIZE(IRAM$L), RUN_SIZE(_IRAM_length) > IRAM
 
         .dsm: {} > SDRAM

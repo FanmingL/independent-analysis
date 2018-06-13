@@ -11,8 +11,8 @@ PHYSICAL MEMORY PARAMETERS
    Default output width :   8
 
 BOOT LOADER PARAMETERS
-   Table Address: 0x90000400, PAGE 0
-   Entry Point  : 0x3e520
+   Table Address: 0x90010400, PAGE 0
+   Entry Point  : 0x3e540
 
 
 OUTPUT TRANSLATION MAP
@@ -22,22 +22,22 @@ OUTPUT TRANSLATION MAP
    OUTPUT FILES: MP3Encoder.hex [b0..b7]
 
    CONTENTS: 90000000..9000011f   MP3Encoder.out(.boot_load)
-             90000120..900003ff   FILL = 00000000
-             90000400..90021be7   BOOT TABLE
-                         .hwi_vec : btad=90000400  dest=0003f400 size=00000200
-                            .bios : btad=9000060c  dest=00032800 size=00005cc0
-                           .pinit : btad=900062d4  dest=0003fd2c size=0000000c
-                            .text : btad=900062e8  dest=0001a400 size=00018400
-                           .cinit : btad=9001e6f0  dest=000384c0 size=0000170c
-                          .switch : btad=9001fe04  dest=0003fcf4 size=00000028
-                         .gblinit : btad=9001fe34  dest=0003fc00 size=00000058
-                         .sysinit : btad=9001fe94  dest=0003dfe0 size=000006c0
-                         .trcdata : btad=9002055c  dest=0003fd38 size=0000000c
-                       .rtdx_text : btad=90020570  dest=0003d140 size=00000ea0
-                           .const : btad=90021418  dest=0003e6a0 size=000004e5
-                            .args : btad=90021908  dest=00039bcc size=00000004
-                           .trace : btad=90021914  dest=0003f600 size=00000200
-                             .log : btad=90021b1c  dest=0003fc98 size=00000030
-                             .sts : btad=90021b54  dest=80048614 size=00000040
-                            .vers : btad=90021b9c  dest=0003fc58 size=00000040
-             90021be8..9003ffff   FILL = 00000000
+             90000120..900103ff   FILL = 00000000
+             90010400..90032307   BOOT TABLE
+                         .hwi_vec : btad=90010400  dest=0003f400 size=00000200
+                            .bios : btad=9001060c  dest=000327c0 size=00005cc0
+                           .pinit : btad=900162d4  dest=0003fd74 size=0000000c
+                            .text : btad=900162e8  dest=00019d00 size=00018ac0
+                           .cinit : btad=9002edb0  dest=00038480 size=0000176c
+                          .switch : btad=90030524  dest=0003fd3c size=00000028
+                         .gblinit : btad=90030554  dest=0003fc00 size=00000058
+                         .sysinit : btad=900305b4  dest=0003e000 size=000006c0
+                         .trcdata : btad=90030c7c  dest=0003fd80 size=0000000c
+                       .rtdx_text : btad=90030c90  dest=0003d160 size=00000ea0
+                           .const : btad=90031b38  dest=0003e6c0 size=000004e5
+                            .args : btad=90032028  dest=00039bec size=00000004
+                           .trace : btad=90032034  dest=0003f600 size=00000200
+                             .log : btad=9003223c  dest=0003fce0 size=00000030
+                             .sts : btad=90032274  dest=80048614 size=00000040
+                            .vers : btad=900322bc  dest=0003fca0 size=00000040
+             90032308..9003ffff   FILL = 00000000

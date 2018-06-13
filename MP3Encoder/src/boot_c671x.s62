@@ -10,7 +10,7 @@ A;
             .include        boot_c671x.h62
 
 ; Address of the generated boot-table
-copyTable      .equ  0x90000400
+copyTable      .equ  0x90010400
 
             .sect ".boot_load"
             .global _boot

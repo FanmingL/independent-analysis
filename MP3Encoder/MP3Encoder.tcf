@@ -290,6 +290,8 @@ bios.MEM.instance("IRAM").heapSize = 0x00015000;
 bios.MEM.STACKSIZE = 0x1300;
 bios.DIO.OBJMEMSEG = prog.get("IRAM");
 bios.MEM.instance("IRAM").heapSize = 0x0001a000;
+bios.MEM.instance("IRAM").heapSize = 0x00019000;
+bios.MEM.instance("IRAM").heapSize = 0x00019900;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 if (config.hasReportedError == false) {

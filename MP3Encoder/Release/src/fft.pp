@@ -19,6 +19,17 @@
 ../bin/fft.obj: C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/unaccess.h
 ../bin/fft.obj: C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/math.h
 ../bin/fft.obj: C:/Users/erdou/workspace_v5_5/MP3Encoder/include/my_sys.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_chip.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_stdinc.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_stdinchal.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_chiphal.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_emifhal.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_chip.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_irq.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_irqhal.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_timer.h
+../bin/fft.obj: C:/ti/ccsv5/cslc6000/include/csl_timerhal.h
 ../bin/fft.obj: C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/mathf.h
 
 ../src/fft.c: 
@@ -40,4 +51,15 @@ C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/mathl.h:
 C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/unaccess.h: 
 C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/math.h: 
 C:/Users/erdou/workspace_v5_5/MP3Encoder/include/my_sys.h: 
+C:/ti/ccsv5/cslc6000/include/csl.h: 
+C:/ti/ccsv5/cslc6000/include/csl_chip.h: 
+C:/ti/ccsv5/cslc6000/include/csl_stdinc.h: 
+C:/ti/ccsv5/cslc6000/include/csl_stdinchal.h: 
+C:/ti/ccsv5/cslc6000/include/csl_chiphal.h: 
+C:/ti/ccsv5/cslc6000/include/csl_emifhal.h: 
+C:/ti/ccsv5/cslc6000/include/csl_chip.h: 
+C:/ti/ccsv5/cslc6000/include/csl_irq.h: 
+C:/ti/ccsv5/cslc6000/include/csl_irqhal.h: 
+C:/ti/ccsv5/cslc6000/include/csl_timer.h: 
+C:/ti/ccsv5/cslc6000/include/csl_timerhal.h: 
 C:/ti/ccsv5/tools/compiler/c6000_7.4.4/include/mathf.h: 

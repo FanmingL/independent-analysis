@@ -12,6 +12,7 @@ $(GEN_CMDS__FLAG) \
 "../bin/matrix.obj" \
 "../bin/led.obj" \
 "../bin/iva.obj" \
+"../bin/flash.obj" \
 "../bin/fft.obj" \
 "../bin/c6713_emif.obj" \
 "../bin/boot_c671x.obj" \
@@ -21,6 +22,7 @@ $(GEN_CMDS__FLAG) \
 "C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/matrix.obj" \
 "C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/led.obj" \
 "C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/iva.obj" \
+"C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/flash.obj" \
 "C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/fft.obj" \
 "C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/c6713_emif.obj" \
 "C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/boot_c671x.obj" \
@@ -147,9 +149,9 @@ all: ../bin/MP3Encoder.out
 # Other Targets
 clean:
 	-$(RM) $(GEN_HDRS__QUOTED)$(GEN_MISC_FILES__QUOTED)$(C6000_EXECUTABLE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(GEN_CMDS__QUOTED) "..\bin\MP3Encoder.out"
-	-$(RM) "MP3Encodercfg_c.pp" "src\MP3Encoder.pp" "src\fft.pp" "src\iva.pp" "src\led.pp" "src\matrix.pp" "src\my_sys.pp" 
+	-$(RM) "MP3Encodercfg_c.pp" "src\MP3Encoder.pp" "src\fft.pp" "src\flash.pp" "src\iva.pp" "src\led.pp" "src\matrix.pp" "src\my_sys.pp" 
 	-$(RM) "MP3Encodercfg.pp" 
-	-$(RM) "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\MP3Encodercfg.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\MP3Encodercfg_c.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\MP3Encoder.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\boot_c671x.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\c6713_emif.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\fft.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\iva.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\led.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\matrix.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\my_sys.obj" 
+	-$(RM) "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\MP3Encodercfg.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\MP3Encodercfg_c.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\MP3Encoder.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\boot_c671x.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\c6713_emif.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\fft.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\flash.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\iva.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\led.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\matrix.obj" "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\my_sys.obj" 
 	-$(RM) "src\boot_c671x.pp" "src\c6713_emif.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

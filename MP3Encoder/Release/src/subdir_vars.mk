@@ -10,6 +10,7 @@ S62_SRCS += \
 C_SRCS += \
 ../src/MP3Encoder.c \
 ../src/fft.c \
+../src/flash.c \
 ../src/iva.c \
 ../src/led.c \
 ../src/matrix.c \
@@ -20,6 +21,7 @@ C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/MP3Encoder.obj \
 C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/boot_c671x.obj \
 C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/c6713_emif.obj \
 C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/fft.obj \
+C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/flash.obj \
 C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/iva.obj \
 C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/led.obj \
 C:/Users/erdou/workspace_v5_5/MP3Encoder/bin/matrix.obj \
@@ -32,6 +34,7 @@ S62_DEPS += \
 C_DEPS += \
 ./src/MP3Encoder.pp \
 ./src/fft.pp \
+./src/flash.pp \
 ./src/iva.pp \
 ./src/led.pp \
 ./src/matrix.pp \
@@ -40,6 +43,7 @@ C_DEPS += \
 C_DEPS__QUOTED += \
 "src\MP3Encoder.pp" \
 "src\fft.pp" \
+"src\flash.pp" \
 "src\iva.pp" \
 "src\led.pp" \
 "src\matrix.pp" \
@@ -50,6 +54,7 @@ OBJS__QUOTED += \
 "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\boot_c671x.obj" \
 "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\c6713_emif.obj" \
 "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\fft.obj" \
+"C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\flash.obj" \
 "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\iva.obj" \
 "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\led.obj" \
 "C:\Users\erdou\workspace_v5_5\MP3Encoder\bin\matrix.obj" \
@@ -62,6 +67,7 @@ S62_DEPS__QUOTED += \
 C_SRCS__QUOTED += \
 "../src/MP3Encoder.c" \
 "../src/fft.c" \
+"../src/flash.c" \
 "../src/iva.c" \
 "../src/led.c" \
 "../src/matrix.c" \

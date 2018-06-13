@@ -4,7 +4,7 @@ MP3Encoder.out  /* input COFF file */
 -memwidth 8 /* Width of ROM/Flash memory */
 -map MP3Encoder_hex.map /* create a hex map file */
 -boot /* create a boot table for all initialized sects*/
--bootorg 0x90000400 /* address of the boot/copy?table */
+-bootorg 0x90010400 /* address of the boot/copy?table */
 -bootsection .boot_load 0x90000000 /* section containing our asm boot routine */
 ROMS
 {

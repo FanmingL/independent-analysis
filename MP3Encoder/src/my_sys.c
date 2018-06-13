@@ -12,7 +12,7 @@
 void my_sys_init(void)
 {
 	matrice_sys_init(MAX_SIZE_REAL, MAX_SIZE_COMPLEX);
-	iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, SHIFT_SIZE, 0.5f, 0.05f);
+	iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, SHIFT_SIZE, iva_configure_instance.beta, iva_configure_instance.eta);
 	fft_init();
 }
 

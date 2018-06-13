@@ -41,6 +41,7 @@
 #include <iva.h>
 #include <csl_pll.h>
 #include <led.h>
+//#include <flash.h>
 #define NUM_CODEC_CHANNELS	 2	/* stereo: left + right		*/
 #define SAMPLEING_RATE		8	/* 8 samples/ms			*/
 #define FRAME_SIZE			8	/* 10 ms					*/
@@ -82,18 +83,48 @@ static Void PlayAudio();
  */
 float tem_in[2];
 void tsk_Audio();
+#define IS_SAVED 0x5555
+iva_configure_t iva_configure_instance;
+#define IVA_MODE ((Uint16)0x1111)			//iva algorithm
+#define NORMAL_MODE ((Uint16)0x5555)			//direct in/out
+
+//#define START_ADDRESS ((0x90038000))
+#define START_ADDRESS ((0x90048000))
+Uint16 save_flag = 0;
+float amplitud_ratio = 0.03f;
+Uint16 run_mode = IVA_MODE;
+Uint16 flag_change = 0;
+Uint32 Flash_Erase(Uint32 addr,Uint16 type);
+void Flash_Readm(Uint32 addr,Uint16 *ptr,Uint32 length);
+void Flash_Writem(Uint32 addr,Uint16 *ptr,Uint32 length);
 Void main()
- {
-	//MCASP_Handle hMcasp = (MCASP_Handle)EC6713_AIC23_OpenCodec();
-	//DEC6713_LED_init();
-	//pll_set();
-	//DEC6713_init();
-	//pll_set();
+{
 	PLL_RSET(PLLM, 24);
+	Flash_Readm(START_ADDRESS, (Uint16*)(&iva_configure_instance), sizeof(iva_configure_t));
+	if (iva_configure_instance.save_flag != IS_SAVED)
+	{
+		iva_configure_instance.beta = 0.5f;
+		iva_configure_instance.eta = 0.05f;
+		iva_configure_instance.ratio = (0.03f);
+		iva_configure_instance.run_flag = NORMAL_MODE;
+		iva_configure_instance.save_flag = IS_SAVED;
+		flag_change = 1;
+	}
+	if (iva_configure_instance.run_flag == NORMAL_MODE)
+	{
+		iva_configure_instance.run_flag = IVA_MODE;
+	}
+	else
+	{
+		iva_configure_instance.run_flag = NORMAL_MODE;
+	}
+	//iva_configure_instance.run_flag = IVA_MODE;
+	Flash_Erase(START_ADDRESS, 0x30);
+	Flash_Writem(START_ADDRESS, (Uint16*)(&iva_configure_instance), sizeof(iva_configure_t));
+	//Flash_Readm(START_ADDRESS, (Uint16*)(&iva_configure_instance), sizeof(iva_configure_t));
+	amplitud_ratio = iva_configure_instance.ratio;
+	run_mode = iva_configure_instance.run_flag;
 	led_configuration();
-	//tsk_Audio();
-		//iva_step(&iva_instance, tem_in);
-    //LOG_printf(&trace, "echo started");
 }
 
 //short *pEchoBuf;
@@ -123,6 +154,7 @@ int echoAtt = 64;
 /* odd(i % 2 = 1) -> left */
 /* even( i % 2 = 0 ) -> right */
 
+
 //float left_channel[CHANELL_LEN], right_channel[CHANELL_LEN];
 float double_buffer[2];
 float **out_buffer;
@@ -135,21 +167,25 @@ void PlayAudio(short *inBuf, short *outBuf)
 
 	for(i=0;i<BUFLEN;i+=2)
 	{
-		double_buffer[0] = ((float)(*(inBuf++))) * RATIO * AMPLITUDE_RATIO;
-		double_buffer[1] = ((float)(*(inBuf++))) * RATIO * AMPLITUDE_RATIO;
-		if ((out_buffer = iva_step(&iva_instance, double_buffer))!=NULL)
+		double_buffer[0] = ((float)(*(inBuf++))) * RATIO * amplitud_ratio;
+		double_buffer[1] = ((float)(*(inBuf++))) * RATIO * amplitud_ratio;
+		if (run_mode == IVA_MODE)
+		//if (1)
 		{
-			for (j = 0; j < SHIFT_SIZE; j++)
+			if ((out_buffer = iva_step(&iva_instance, double_buffer))!=NULL)
 			{
-				//out_buffer[j][0] = (out_buffer[j][0] > 1) ? 1 : ( (out_buffer[j][0] < -1) ? -1 :out_buffer[j][0]);
-				//out_buffer[j][1] = (out_buffer[j][1] > 1) ? 1 : ( (out_buffer[j][1] < -1) ? -1 :out_buffer[j][1]);
-
-				*outBuf++ = (short)(out_buffer[j][0] * SHORT_MAX);
-				*outBuf++ = (short)(out_buffer[j][1] * SHORT_MAX);
+				for (j = 0; j < SHIFT_SIZE; j++)
+				{
+					*outBuf++ = (short)(out_buffer[j][0] * SHORT_MAX);
+					*outBuf++ = (short)(out_buffer[j][1] * SHORT_MAX);
+				}
 			}
 		}
-		//*outBuf++ = (short)(double_buffer[0] * SHORT_MAX);
-		//*outBuf++ = (short)(double_buffer[1] * SHORT_MAX);
+		else
+		{
+		*outBuf++ = (short)(double_buffer[0] * SHORT_MAX);
+		*outBuf++ = (short)(double_buffer[1] * SHORT_MAX);
+		}
 	}
 }
 
@@ -258,12 +294,24 @@ Void tsk_Audio()
 
 		/* process echo algorithm */
 		PlayAudio(inbuf, outbuf);
-		if(slank_time++==20)
+		if ((run_mode == IVA_MODE))
+		{
+			if((slank_time++==20))
+			{
+				led_toggle();
+				slank_time = 0;
+			}
+		}
+		else
 		{
 			led_toggle();
-			slank_time = 0;
 		}
-
+		if (save_flag==1)
+		{
+			save_flag = 0;
+			Flash_Erase(START_ADDRESS,  0x30);
+			Flash_Writem(START_ADDRESS, (Uint16*)(&iva_configure_instance), sizeof(iva_configure_t));
+		}
         /* Issue full buffer to the output stream */
         if (SIO_issue(outStream, outbuf, nmadus, NULL) != SYS_OK) {
             SYS_abort("Error issuing full buffer to the output stream");
