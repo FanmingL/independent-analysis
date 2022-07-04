@@ -7,7 +7,7 @@
 
 #ifndef _FFT_H
 #define _FFT_H
-#include <matrix.h>
+#include "matrix.h"
 #include <math.h>
 #define NOT2POW(a) (((a)-1)&(a)||(a)<=0)
 MatcP fft(MatcP signal, MatcP fft_signal);

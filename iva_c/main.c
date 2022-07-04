@@ -29,15 +29,14 @@ int main(int argc, char** argv)
     iva_init(&iva_instance, FFT_LEN, SOURCE_NUM, SHIFT_SIZE, 0.5, 0.1);
     fft_init(FFT_LEN, SOURCE_NUM);
     
-    fp=fopen("/Users/erdou/Documents/MacToWin/Share/audio/data.prototxt","r");
-    fp2=fopen("/Users/erdou/Documents/GitHub/independent-analysis/iva_c/out.prototxt","w");
+    fp=fopen("/full/path/to/data_c.prototxt", "r");
+    fp2=fopen("/full/path/to/out_c.prototxt","w");
     if ( fp )
     {
         for (int  i=0;i<595957;i++ )
         {
-            fscanf(fp, "%f, %f", &buffer[i][0], &buffer[i][1]);
-            //buffer[i][0]  /= 100;
-            //buffer[i][1] /= 100;
+            fscanf(fp, "%f", &buffer[i][0]);
+            fscanf(fp, "%f", &buffer[i][1]);
         }
         fclose(fp);
     }

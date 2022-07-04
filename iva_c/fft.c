@@ -6,8 +6,8 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include <fft.h>
-#include <matrix.h>
+#include "fft.h"
+#include "matrix.h"
 
 Matc* signal_temp1, *signal_temp2, *signal_temp3;
 Matc* fft_temp1, *fft_temp2, *fft_temp3;

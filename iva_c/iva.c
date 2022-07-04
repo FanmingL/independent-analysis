@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include <iva.h>
+#include "iva.h"
 iva_t iva_instance;
 
 void my_sys_init(void)

@@ -10,9 +10,9 @@ lib_dir =
 lib = 
 
 $(target):$(objects)
-	$(CC) -o $@ $^ $(lib_dir) $(lib)
+	$(CC) -O2 -o $@ $^ $(lib_dir) $(lib) 
 %.o:%.c
-	${CC} ${cflags} -o $@ -c $< $(inc)  
+	${CC} ${cflags} -O2 -o $@ -c $< $(inc)  
 
 clean:
 	rm -rf $(target) $(objects)

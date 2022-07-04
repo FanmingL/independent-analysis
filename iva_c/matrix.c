@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include <stdio.h>
-#include <matrix.h>
+#include "matrix.h"
 #define VAL_ADD(x,y,out) out.real = x.real + y.real;\
 							out.imag = x.imag + y.imag;
 #define VAL_MUL(x,y,out) out.real = x.real * y.real - x.imag * y.imag;\
